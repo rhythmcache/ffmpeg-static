@@ -130,7 +130,7 @@ download_sources() {
         [ ! -f openmpt.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$OPENMPT_URL' -o openmpt.tar.gz"
         [ ! -f tiff.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$TIFF_URL' -o tiff.tar.gz"
         [ ! -f xvid.tar.xz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$XVID_URL' -o xvid.tar.xz"
-        [ ! -f ffmpeg.tar.xz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$FFMPEG_URL' -o ffmpeg.tar.xz"
+      #  [ ! -f ffmpeg.tar.xz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$FFMPEG_URL' -o ffmpeg.tar.xz"
         [ ! -f libssh.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$LIBSSH_URL' -o libssh.tar.gz"
         [ ! -f libbs2b.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$LIBBS2B_URL' -o libbs2b.tar.gz"
         [ ! -f svtav1.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$SVTAV1_URL' -o svtav1.tar.gz"
@@ -191,6 +191,7 @@ download_sources() {
         [ ! -d pango ] && echo "git clone --depth 1 https://github.com/GNOME/pango pango"
         [ ! -d cairo ] && echo "git clone --depth 1 https://gitlab.freedesktop.org/cairo/cairo cairo"
         [ ! -d librsvg ] && echo "git clone --depth 1 https://github.com/GNOME/librsvg librsvg"
+        [ ! -d ffmpeg ] && echo "git clone --depth 1 https://github.com/FFmpeg/FFmpeg ffmpeg"
     } > "$clone_cmds"
 
     # Execute downloads in parallel
@@ -244,6 +245,6 @@ download_sources() {
     [ ! -d libbs2b ] && tar -xf libbs2b.tar.gz && mv "$LIBBS2B_VERSION" libbs2b
     [ ! -d fftw ] && tar -xf fftw.tar.gz && mv "$FFTW_VERSION" fftw
     [ ! -d libffi ] && tar -xf libffi.tar.gz && mv "$LIBFFI_VERSION" libffi
-    [ ! -d ffmpeg ] && tar -xf ffmpeg.tar.xz && mv "$FFMPEG_VERSION" ffmpeg
+ #   [ ! -d ffmpeg ] && tar -xf ffmpeg.tar.xz && mv "$FFMPEG_VERSION" ffmpeg
     
 }
