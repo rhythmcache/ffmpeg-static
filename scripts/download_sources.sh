@@ -29,7 +29,6 @@ BUDFREAD_VERSION="libudfread-master"
 OPENMPT_VERSION="libopenmpt-0.8.2"
 LIBGSM_VERSION="gsm-1.0.22"
 TIFF_VERSION="tiff-4.7.0"
-LIBILIBC_VERSION="libilbc-3.0.4"
 XVID_VERSION="xvidcore-1.3.7"
 LIBSSH_VERSION="libssh-0.11.0"
 XZ_VERSION="xz-5.8.1"
@@ -96,7 +95,6 @@ LIBRIST_URL="https://code.videolan.org/rist/librist"
 LIBZMQ_URL="https://github.com/zeromq/libzmq"
 LIBGSM_URL="https://www.quut.com/gsm/${LIBGSM_VERSION}.tar.gz"
 TIFF_URL="https://download.osgeo.org/libtiff/${TIFF_VERSION}.tar.gz"
-LIBILIBC_URL="https://github.com/TimothyGu/libilbc/releases/download/v3.0.4/${LIBILIBC_VERSION}rc2.tar.gz"
 XVID_URL="https://downloads.xvid.com/downloads/${XVID_VERSION}.tar.gz"
 LIBSSH_URL="https://www.libssh.org/files/0.11/${LIBSSH_VERSION}.tar.xz"
 
@@ -125,7 +123,7 @@ download_sources() {
     [ ! -f vorbis.tar.xz ]      && curl -L "$VORBIS_URL" -o vorbis.tar.xz
     [ ! -f ogg.tar.gz ]         && curl -L "$OGG_URL" -o ogg.tar.gz
     [ ! -f dav1d.tar.gz ]       && curl -L "$DAV1D_URL" -o dav1d.tar.gz
-    [ ! -f libass.tar.gz ]      && curl -L "$LIBASS_URL" -o libass.tar.
+    [ ! -f libass.tar.gz ]      && curl -L "$LIBASS_URL" -o libass.tar.gz
     [ ! -f libpng.tar.gz ]      && curl -L "$LIBPNG_URL" -o libpng.tar.gz
     [ ! -f fontconfig.tar.xz ]  && curl -L "$FONTCONFIG_URL" -o fontconfig.tar.xz
     [ ! -f fribidi.tar.xz ]     && curl -L "$FRIBIDI_URL" -o fribidi.tar.xz
@@ -136,7 +134,6 @@ download_sources() {
     [ ! -f budfread.tar.gz ]    && curl -L "$BUDFREAD_URL" -o budfread.tar.gz
     [ ! -f openmpt.tar.gz ]     && curl -L "$OPENMPT_URL" -o openmpt.tar.gz
     [ ! -f tiff.tar.gz ]        && curl -L "$TIFF_URL" -o tiff.tar.gz
-    [ ! -f libilibc.tar.gz ]    && curl -L "$LIBILIBC_URL" -o libilibc.tar.gz
     [ ! -f xvid.tar.xz ]      && curl -L "$XVID_URL" -o xvid.tar.xz
     [ ! -f ffmpeg.tar.xz ]      && curl -L "$FFMPEG_URL" -o ffmpeg.tar.xz
     [ ! -f libssh.tar.gz ] && curl -L "$LIBSSH_URL" -o libssh.tar.gz
@@ -160,6 +157,7 @@ download_sources() {
     [ ! -d librist ] && git clone --depth 1 "$LIBRIST_URL"
     [ ! -d libzmq ] && git clone --depth 1 "$LIBZMQ_URL"
     [ ! -d libplacebo ] && git clone --recursive https://github.com/haasn/libplacebo
+    [ ! -d libilbc ] && git clone --recursive https://github.com/TimothyGu/libilbc
     [ ! -d rav1e ] && git clone --depth 1 https://github.com/xiph/rav1e
     [ ! -d vo-amrwbenc ] && git clone --depth 1 https://github.com/mstorsjo/vo-amrwbenc
     [ ! -d opencore-amr ] && git clone --depth 1 https://github.com/BelledonneCommunications/opencore-amr
@@ -190,7 +188,7 @@ download_sources() {
     [ ! -d quirc ] && git clone --depth 1 https://github.com/dlbeer/quirc
     [ ! -d chromaprint ] && git clone --depth 1 https://github.com/acoustid/chromaprint
     [ ! -d libcaca ] && git clone --depth 1 https://github.com/cacalabs/libcaca
-    [ ! -d pixman ] && git clone --depth 1 https://gitlab.freedesktop.org/pixman/pixman.git
+    [ ! -d pixman ] && git clone --depth 1 https://gitlab.freedesktop.org/pixman/pixman
     [ ! -d pango ] && git clone --depth 1 https://github.com/GNOME/pango
     [ ! -d cairo ] && git clone --depth 1 https://gitlab.freedesktop.org/cairo/cairo
     [ ! -d librsvg ] && git clone --depth 1 https://github.com/GNOME/librsvg
@@ -221,7 +219,6 @@ download_sources() {
     [ ! -d budfread ]    && tar -xf budfread.tar.gz    && mv "$BUDFREAD_VERSION" budfread
     [ ! -d openmpt ]     && tar -xf openmpt.tar.gz     && mv "$OPENMPT_VERSION"* openmpt
     [ ! -d libgsm ]      && tar -xf libgsm.tar.xz      && mv gsm* libgsm
-    [ ! -d libilibc ]    && tar -xf libilibc.tar.gz    && mv "$LIBILIBC_VERSION" libilibc
     [ ! -d libssh ]      && tar -xf libssh.tar.gz && mv "$LIBSSH_VERSION" libssh
     [ ! -d svtav1 ]      && tar -xf svtav1.tar.gz && mv "$SVTAV1_VERSION" svtav1
     [ ! -d xvidcore ]    && tar -xf xvid.tar.xz
