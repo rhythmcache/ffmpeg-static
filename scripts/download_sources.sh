@@ -61,7 +61,6 @@ FRIBIDI_URL="https://github.com/fribidi/fribidi/releases/download/v1.0.16/${FRIB
 BLURAY_URL="https://code.videolan.org/videolan/libbluray/-/archive/master/${BLURAY_VERSION}.tar.gz"
 THEORA_URL="http://downloads.xiph.org/releases/theora/${THEORA_VERSION}.tar.gz"
 SPEEX_URL="http://downloads.xiph.org/releases/speex/${SPEEX_VERSION}.tar.gz"
-OPENJPEG_URL="https://github.com/uclouvain/openjpeg"
 LIBXML2_URL="https://github.com/GNOME/libxml2.git"
 HARFBUZZ_URL="https://github.com/harfbuzz/harfbuzz.git"
 LIBEXPAT_URL="https://github.com/libexpat/libexpat/releases/download/R_2_7_1/${LIBEXPAT_VERSION}.tar.gz"
@@ -142,7 +141,7 @@ download_sources() {
     # Build clone commands for git repositories
     {
         [ ! -d freetype ] && echo "git clone --depth 1 '$FREETYPE_URL' freetype"
-        [ ! -d openjpeg ] && echo "git clone --depth 1 '$OPENJPEG_URL' openjpeg"
+        [ ! -d openjpeg ] && echo "git clone --depth 1 https://github.com/libjpeg-turbo/libjpeg-turbo openjpeg"
         [ ! -d libxml2 ] && echo "git clone --depth 1 '$LIBXML2_URL' libxml2"
         [ ! -d harfbuzz ] && echo "git clone --depth 1 '$HARFBUZZ_URL' harfbuzz"
         [ ! -d libwebp ] && echo "git clone --depth 1 '$WEBP_URL' libwebp"
@@ -182,7 +181,7 @@ download_sources() {
         [ ! -d opencl ] && echo "git clone --depth 1 https://github.com/KhronosGroup/OpenCL-Headers opencl"
         [ ! -d pocl ] && echo "git clone --depth 1 https://github.com/pocl/pocl pocl"
         [ ! -d highway ] && echo "git clone --depth 1 https://github.com/google/highway highway"
-        [ ! -d libjxl ] && echo "git clone --depth 1 https://github.com/libjxl/libjxl libjxl"
+        [ ! -d libjxl ] && echo "git clone --recursive https://github.com/libjxl/libjxl libjxl"
         [ ! -d libqrencode ] && echo "git clone --depth 1 https://github.com/fukuchi/libqrencode libqrencode"
         [ ! -d quirc ] && echo "git clone --depth 1 https://github.com/dlbeer/quirc quirc"
         [ ! -d chromaprint ] && echo "git clone --depth 1 https://github.com/acoustid/chromaprint chromaprint"
