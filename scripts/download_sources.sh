@@ -169,7 +169,7 @@ download_sources() {
         [ ! -d kvazaar ] && echo "git clone --recursive https://github.com/ultravideo/kvazaar kvazaar"
         [ ! -d xavs2 ] && echo "git clone --depth 1 https://github.com/pkuvcl/xavs2 xavs2"
         [ ! -d davs2 ] && echo "git clone --depth 1 https://github.com/pkuvcl/davs2 davs2"
-        [ ! -d rtmpdump ] && echo "git clone --depth 1 https://github.com/mstorsjo/rtmpdump rtmpdump"
+        [ ! -d rtmpdump ] && echo "git clone git://git.ffmpeg.org/rtmpdump rtmpdump"
         [ ! -d vvdec ] && echo "git clone --depth 1 https://github.com/fraunhoferhhi/vvdec vvdec"
         [ ! -d vvenc ] && echo "git clone --depth 1 https://github.com/fraunhoferhhi/vvenc vvenc"
         [ ! -d vapoursynth ] && echo "git clone --depth 1 https://github.com/vapoursynth/vapoursynth vapoursynth"
