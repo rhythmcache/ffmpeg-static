@@ -115,6 +115,7 @@ download_sources
 build_libcaca
 [ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp  "$ROOT_DIR/patches/vapoursynth"/*  "$BUILD_DIR/vapoursynth" 
 build_zlib
+build_openjpeg
 build_liblzma
 build_zstd
 build_pcre2
@@ -146,7 +147,7 @@ build_libass
 build_udfread
 build_bluray
 build_libtheora
-build_openjpeg
+
 build_libjpeg
 build_libwebp
 build_vmaf
