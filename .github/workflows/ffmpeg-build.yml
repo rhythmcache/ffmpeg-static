@@ -25,7 +25,6 @@ jobs:
           libtool \
           pkg-config \
           texinfo \
-          makeinfo \
           gettext \
           gperf \
           bison \
