@@ -30,38 +30,13 @@ jobs:
           bison \
           flex \
           git \
-          wget \
-          curl \
-          tar \
-          gzip \
           xz-utils \
           unzip \
-          patch \
-          sed \
-          grep \
-          awk \
           diffutils \
           file \
           findutils \
           coreutils \
           binutils \
-          gcc \
-          g++ \
-          libc6-dev \
-          linux-libc-dev \
-          libssl-dev \
-          zlib1g-dev \
-          libncurses5-dev \
-          libreadline-dev \
-          libsqlite3-dev \
-          libgdbm-dev \
-          libdb-dev \
-          libbz2-dev \
-          libexpat1-dev \
-          liblzma-dev \
-          tk-dev \
-          libffi-dev \
-          uuid-dev \
           python3 \
           python3-pip \
           python3-venv
