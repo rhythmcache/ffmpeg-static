@@ -34,6 +34,7 @@ ZSTD_VERSION="zstd-1.5.7"
 LIBBS2B_VERSION="libbs2b-3.1.0"
 SVTAV1_VERSION="SVT-AV1-v3.1.0"
 FFTW_VERSION="fftw-3.3.10"
+LIBFFI_VERSION="libffi-3.5.2"
 
 # URL definitions
 FFMPEG_URL="https://ffmpeg.org/releases/${FFMPEG_VERSION}.tar.xz"
@@ -84,6 +85,7 @@ XVID_URL="https://downloads.xvid.com/downloads/${XVID_VERSION}.tar.gz"
 LIBSSH_URL="https://www.libssh.org/files/0.11/${LIBSSH_VERSION}.tar.xz"
 LIBBS2B_URL="https://sourceforge.net/projects/bs2b/files/libbs2b/3.1.0/${LIBBS2B_VERSION}.tar.gz/download"
 FFTW_URL="https://www.fftw.org/${FFTW_VERSION}.tar.gz"
+LIBFFI_URL="https://github.com/libffi/libffi/releases/download/v3.5.2/${LIBFFI_VERSION}.tar.gz"
 
 # Number of parallel downloads (can be overridden by setting PARALLEL_DOWNLOADS)
 PARALLEL_DOWNLOADS=${PARALLEL_DOWNLOADS:-8}
@@ -134,6 +136,7 @@ download_sources() {
         [ ! -f libbs2b.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$LIBBS2B_URL' -o libbs2b.tar.gz"
         [ ! -f svtav1.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$SVTAV1_URL' -o svtav1.tar.gz"
         [ ! -f fftw.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$FFTW_URL' -o fftw.tar.gz"
+        [ ! -f libffi.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$LIBFFI_URL' -o libffi.tar.gz"
     } > "$download_cmds"
 
     # Build clone commands for git repositories
@@ -169,7 +172,6 @@ download_sources() {
         [ ! -d vvdec ] && echo "git clone --depth 1 https://github.com/fraunhoferhhi/vvdec vvdec"
         [ ! -d vvenc ] && echo "git clone --depth 1 https://github.com/fraunhoferhhi/vvenc vvenc"
         [ ! -d vapoursynth ] && echo "git clone --depth 1 https://github.com/vapoursynth/vapoursynth vapoursynth"
-        [ ! -d libffi ] && echo "git clone --depth 1 https://github.com/libffi/libffi libffi"
         [ ! -d glib ] && echo "git clone --depth 1 https://github.com/GNOME/glib glib"
         [ ! -d lensfun ] && echo "git clone --depth 1 https://github.com/lensfun/lensfun lensfun"
         [ ! -d flite ] && echo "git clone --depth 1 https://github.com/festvox/flite flite"
@@ -240,6 +242,7 @@ download_sources() {
     [ ! -d xvidcore ] && tar -xf xvid.tar.xz
     [ ! -d libbs2b ] && tar -xf libbs2b.tar.gz && mv "$LIBBS2B_VERSION" libbs2b
     [ ! -d fftw ] && tar -xf fftw.tar.gz && mv "$FFTW_VERSION" fftw
+    [ ! -d libffi ] && tar -xf libffi.tar.gz && mv "$LIBFFI_VERSION" libffi
     [ ! -d ffmpeg ] && tar -xf ffmpeg.tar.xz && mv "$FFMPEG_VERSION" ffmpeg
     
 }
