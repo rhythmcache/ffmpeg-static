@@ -938,6 +938,31 @@ build_libtheora() {
 }
 
 build_openjpeg() {
+    echo " Building OpenJPEG for $ARCH..."
+
+    cd "$BUILD_DIR/openjpeg"
+    rm -rf build && mkdir -p build && cd build
+
+    cmake .. \
+        "${COMMON_CMAKE_FLAGS[@]}" \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DBUILD_JPIP=OFF \
+        -DBUILD_JPWL=OFF \
+        -DBUILD_DOC=OFF \
+        -DBUILD_CODEC=OFF \
+        -DBUILD_THIRDPARTY=OFF \
+        -DBUILD_TESTING=OFF \
+        -DBUILD_PKGCONFIG_FILES=ON
+
+    make -j"$(nproc)"
+    make install
+
+    echo "✅ OpenJPEG built successfully"
+}
+
+
+build_libjpeg() {
     echo "Building openjpeg for $ARCH..."
     cd "$BUILD_DIR/openjpeg"
     rm -rf build
@@ -971,8 +996,10 @@ esac
     make -j"$(nproc)"
     make install
 
-    echo "✔ openjpeg built successfully"
+    echo "✔ libjpeg built successfully"
 }
+
+
 
 build_libwebp() {
     echo "Building libwebp for $ARCH..."
@@ -2237,6 +2264,8 @@ build_highway() {
     cd "$BUILD_DIR/highway" || exit 1
 
     [ -f "BUILD" ] && mv "BUILD" "BUILD.bazzle"
+
+    rm -rf build
 
     cmake -B build -S . \
         "${COMMON_CMAKE_FLAGS[@]}" \
