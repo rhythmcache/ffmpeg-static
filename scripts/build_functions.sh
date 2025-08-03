@@ -91,27 +91,33 @@ build_openssl() {
     cd "$BUILD_DIR/openssl"
 
     case "$ARCH" in
-        aarch64) OPENSSL_TARGET="linux-aarch64" ;;
-        armv7)   OPENSSL_TARGET="linux-armv4" ;;
-        x86)     OPENSSL_TARGET="linux-x86" ;;
-        x86_64)  OPENSSL_TARGET="linux-x86_64" ;;
-        riscv64) OPENSSL_TARGET="linux-generic64" ;;
-    esac
+    aarch64) OPENSSL_TARGET="linux-aarch64" ;;
+    armv7)   OPENSSL_TARGET="linux-armv4" ;;
+    x86)
+        OPENSSL_TARGET="linux-x86"
+        ASM="no-asm"
+        ;;
+    x86_64)  OPENSSL_TARGET="linux-x86_64" ;;
+    riscv64) OPENSSL_TARGET="linux-generic64" ;;
+    *) echo "Unknown architecture: $ARCH" >&2; exit 1 ;;
+esac
+
+
      (make clean && make distclean) || true
+
     ./Configure "$OPENSSL_TARGET" \
-     no-tests no-shared no-dso no-threads no-engine no-ssl3 no-comp \
+     no-tests no-shared no-dso no-threads no-engine no-ssl3 no-comp -static "${ASM}" \
     --prefix="$PREFIX" \
     --openssldir="$PREFIX/ssl" \
      --with-zlib-include="$PREFIX/include" \
      --with-zlib-lib="$PREFIX/lib"
 
 
-    make -j"$(nproc)" build_sw
+    make -j"$(nproc)" build_libs
     make install_sw
 
     echo "✔ OpenSSL built successfully"
 }
-
 
 
 build_x264() {
@@ -2726,8 +2732,7 @@ build_ffmpeg() {
         --enable-vapoursynth \
         --enable-libqrencode \
         --enable-libquirc \
-        --enable-libcaca \
-        --enable-chromaprint
+        --enable-libcaca
 
 
     make -j"$(nproc)"
