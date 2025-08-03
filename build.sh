@@ -117,8 +117,9 @@ done
 download_sources
 
 [ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp  "$ROOT_DIR/patches/vapoursynth"/*  "$BUILD_DIR/vapoursynth" 
-
-
+build_libffi
+exit 1
+: <<'IDK'
 build_zlib
 build_liblzma
 build_zstd
@@ -208,3 +209,4 @@ build_chromaprint
 # build_librsvg
 #---------------------------------------------------------------#
 build_ffmpeg
+IDK
