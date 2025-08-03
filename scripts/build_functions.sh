@@ -936,23 +936,31 @@ build_openjpeg() {
     cd "$BUILD_DIR/openjpeg"
     rm -rf build
 
+   case "$ARCH" in
+  x86_64|x86)
+    WITH_SIMD=ON
+    ;;
+  arm*|aarch64)
+    WITH_SIMD=OFF
+    ;;
+  *)
+    WITH_SIMD=OFF
+    ;;
+esac
+
     mkdir -p build && cd build
 
     cmake .. \
-        -DCMAKE_INSTALL_PREFIX="$PREFIX" \
-        -DCMAKE_SYSTEM_NAME=Linux \
-        -DCMAKE_C_COMPILER="$CC_ABS" \
-        -DCMAKE_AR="$AR_ABS" \
-        -DCMAKE_RANLIB="$RANLIB_ABS" \
-        -DCMAKE_STRIP="$STRIP_ABS" \
+        "${COMMON_CMAKE_FLAGS[@]}" \
         -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_SHARED_LIBS=OFF \
-        -DBUILD_STATIC_LIBS=ON \
-        -DBUILD_CODEC=OFF \
-        -DBUILD_DOC=OFF \
-        -DBUILD_PKGCONFIG_FILES=ON \
-        -DBUILD_TESTING=OFF \
-        -DBUILD_THIRDPARTY=OFF
+        -DENABLE_SHARED=OFF \
+        -DENABLE_STATIC=ON \
+        -DWITH_SIMD="${WITH_SIMD}" \
+        -DWITH_TOOLS=OFF \
+         -DWITH_TESTS=OFF \
+         -DWITH_FUZZ=OFF \
+         -DWITH_TURBOJPEG=OFF
+
 
     make -j"$(nproc)"
     make install
@@ -2221,6 +2229,8 @@ build_opencl() {
 
 build_highway() {
     cd "$BUILD_DIR/highway" || exit 1
+
+    [ -f "BUILD" ] && mv "BUILD" "BUILD.bazzle"
 
     cmake -B build -S . \
         "${COMMON_CMAKE_FLAGS[@]}" \
