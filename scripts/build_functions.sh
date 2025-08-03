@@ -1887,6 +1887,28 @@ build_libffi() {
     make install
 }
 
+
+build_pcre2() {
+    echo "Building pcre2 for $ARCH....."
+    cd "$BUILD_DIR/pcre2"
+    rm -rf out && mkdir out && cd out
+
+    cmake .. \
+        "${CMAKE_COMMON_FLAGS[@]}" \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DPCRE2_BUILD_PCRE2_16=OFF \
+        -DPCRE2_BUILD_PCRE2_32=OFF \
+        -DPCRE2_BUILD_TESTS=OFF \
+        -DPCRE2_BUILD_PCRE2GREP=OFF \
+        -DPCRE2_BUILD_PCRE2TEST=OFF \
+        -DPCRE2_SUPPORT_JIT=OFF \
+        -DPCRE2_STATIC_RUNTIME=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+
+    make -j"$(nproc)"
+    make install
+}
+
 build_glib() {
     echo "Building glib (Meson) for $ARCH..."
 
