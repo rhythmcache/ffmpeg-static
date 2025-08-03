@@ -193,8 +193,8 @@ build_highway
 build_libjxl
 build_libqrencode
 build_quirc
-build_fftw
-build_chromaprint
+#build_fftw
+#build_chromaprint
 #----------- These 4 are needed to build librsvg---------------#
 # build_pixman
 # build_cairo
