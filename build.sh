@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 ARCH="$1"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
