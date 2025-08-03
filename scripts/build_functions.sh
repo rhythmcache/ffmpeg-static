@@ -2317,14 +2317,21 @@ build_libcaca() {
     CXX="$CXX_ABS" \
     ./configure \
         --host="$HOST" \
-        --disable-shared \
-        --enable-static \
-        --disable-curses \
-        --disable-ncurses \
-        --disable-slang \
-        --disable-x11 \
-        --disable-imlib2 \
+        --disable-java \
+         --disable-cxx \
         --disable-doc \
+        --disable-imlib2 \
+        --disable-x11 \
+        --disable-gl \
+        --disable-slang \
+       --disable-ncurses \
+        --disable-curses \
+       --disable-vga \
+        --disable-win32 \
+        --disable-conio \
+        --disable-sdl \
+         --disable-tools \
+         --disable-tests \
         --prefix="$PREFIX"
 
     make -j"$(nproc)"
