@@ -157,6 +157,7 @@ download_sources() {
         [ ! -d librist ] && echo "git clone --depth 1 '$LIBRIST_URL' librist"
         [ ! -d libzmq ] && echo "git clone --depth 1 '$LIBZMQ_URL' libzmq"
         [ ! -d libplacebo ] && echo "git clone --recursive https://github.com/haasn/libplacebo libplacebo"
+        [ ! -d pcre2 ] && echo "git clone --depth 1 https://github.com/PCRE2Project/pcre2.git"
         [ ! -d libilbc ] && echo "git clone --recursive https://github.com/TimothyGu/libilbc libilbc"
         [ ! -d rav1e ] && echo "git clone --depth 1 https://github.com/xiph/rav1e rav1e"
         [ ! -d vo-amrwbenc ] && echo "git clone --depth 1 https://github.com/mstorsjo/vo-amrwbenc vo-amrwbenc"
