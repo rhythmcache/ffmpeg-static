@@ -147,6 +147,7 @@ build_udfread
 build_bluray
 build_libtheora
 build_openjpeg
+build_libjpeg
 build_libwebp
 build_vmaf
 build_libzimg
