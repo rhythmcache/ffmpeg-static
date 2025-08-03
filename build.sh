@@ -117,6 +117,7 @@ build_zlib
 build_liblzma
 build_zstd
 build_pcre2
+build_libcaca
 build_openssl
 build_rtmp
 build_libgsm
@@ -192,7 +193,6 @@ build_highway
 build_libjxl
 build_libqrencode
 build_quirc
-build_libcaca
 build_fftw
 build_chromaprint
 #----------- These 4 are needed to build librsvg---------------#
