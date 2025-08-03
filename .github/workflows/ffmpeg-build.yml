@@ -1,0 +1,243 @@
+# Complete build workflow with toolchain setup
+name: Build with musl toolchain
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install system dependencies and build tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          ninja-build \
+          make \
+          autoconf \
+          automake \
+          libtool \
+          pkg-config \
+          texinfo \
+          makeinfo \
+          gettext \
+          gperf \
+          bison \
+          flex \
+          git \
+          wget \
+          curl \
+          tar \
+          gzip \
+          xz-utils \
+          unzip \
+          patch \
+          sed \
+          grep \
+          awk \
+          diffutils \
+          file \
+          findutils \
+          coreutils \
+          binutils \
+          gcc \
+          g++ \
+          libc6-dev \
+          linux-libc-dev \
+          libssl-dev \
+          zlib1g-dev \
+          libncurses5-dev \
+          libreadline-dev \
+          libsqlite3-dev \
+          libgdbm-dev \
+          libdb-dev \
+          libbz2-dev \
+          libexpat1-dev \
+          liblzma-dev \
+          tk-dev \
+          libffi-dev \
+          uuid-dev \
+          python3 \
+          python3-pip \
+          python3-venv
+
+    - name: Install pipx and meson
+      run: |
+        python3 -m pip install --user pipx
+        python3 -m pipx ensurepath
+        export PATH="$HOME/.local/bin:$PATH"
+        pipx install meson
+        # Verify installation
+        meson --version
+
+    - name: Download musl toolchain
+      run: |
+        echo "Downloading musl toolchain..."
+        wget -O musl-cross-aarch64-linux-musl.tar.gz \
+          "https://github.com/rhythmcache/musl-toolchain/releases/download/musl-toolchains-20250803-094319/musl-cross-aarch64-linux-musl.tar.gz"
+        
+        echo "Verifying download..."
+        ls -la musl-cross-aarch64-linux-musl.tar.gz
+        file musl-cross-aarch64-linux-musl.tar.gz
+
+    - name: Extract toolchain and setup PATH
+      run: |
+        echo "Extracting toolchain..."
+        tar -xzf musl-cross-aarch64-linux-musl.tar.gz
+        
+        echo "Finding extracted directory..."
+        ls -la
+        
+        # Find the extracted directory (it might have a different name)
+        TOOLCHAIN_DIR=$(find . -maxdepth 1 -type d -name "*aarch64*musl*" | head -1)
+        if [ -z "$TOOLCHAIN_DIR" ]; then
+          echo "Looking for any extracted directory..."
+          TOOLCHAIN_DIR=$(find . -maxdepth 1 -type d ! -name ".*" ! -name "_work" | grep -v "^\\.$" | head -1)
+        fi
+        
+        echo "Toolchain directory: $TOOLCHAIN_DIR"
+        ls -la "$TOOLCHAIN_DIR"/
+        
+        # Export toolchain bin to PATH
+        TOOLCHAIN_BIN="$PWD/$TOOLCHAIN_DIR/bin"
+        echo "Adding to PATH: $TOOLCHAIN_BIN"
+        echo "$TOOLCHAIN_BIN" >> $GITHUB_PATH
+        
+        # Also export for current step
+        export PATH="$TOOLCHAIN_BIN:$PATH"
+        export PATH="$HOME/.local/bin:$PATH"
+        
+        # Verify toolchain
+        echo "Verifying toolchain..."
+        ls -la "$TOOLCHAIN_BIN"/
+        if [ -f "$TOOLCHAIN_BIN/aarch64-linux-musl-gcc" ]; then
+          "$TOOLCHAIN_BIN/aarch64-linux-musl-gcc" --version
+        fi
+
+    - name: Execute build script
+      run: |
+        # Ensure PATH includes both toolchain and pipx
+        export PATH="$HOME/.local/bin:$PATH"
+        
+        # Make build script executable
+        chmod +x ./build.sh
+        
+        echo "Starting build with aarch64 target..."
+        echo "Current PATH: $PATH"
+        echo "Current directory: $(pwd)"
+        
+        # Execute the build script
+        ./build.sh aarch64
+
+    - name: Check build results and collect binaries
+      run: |
+        echo "Checking build results..."
+        
+        # Primary location: build/aarch64/prefix/bin
+        PRIMARY_BIN_DIR="build/aarch64/prefix/bin"
+        SECONDARY_BIN_DIR="build/aarch64/ffmpeg"
+        
+        echo "Looking for binaries in primary location: $PRIMARY_BIN_DIR"
+        if [ -d "$PRIMARY_BIN_DIR" ]; then
+          ls -la "$PRIMARY_BIN_DIR"/
+          
+          if [ -f "$PRIMARY_BIN_DIR/ffmpeg" ] && [ -f "$PRIMARY_BIN_DIR/ffprobe" ]; then
+            echo "✅ Found both ffmpeg and ffprobe in $PRIMARY_BIN_DIR"
+            mkdir -p artifacts
+            cp "$PRIMARY_BIN_DIR/ffmpeg" artifacts/
+            cp "$PRIMARY_BIN_DIR/ffprobe" artifacts/
+            echo "BINARIES_FOUND=primary" >> $GITHUB_ENV
+          else
+            echo "❌ Missing binaries in primary location"
+            echo "Contents of $PRIMARY_BIN_DIR:"
+            ls -la "$PRIMARY_BIN_DIR"/ || echo "Directory does not exist"
+          fi
+        else
+          echo "❌ Primary bin directory does not exist: $PRIMARY_BIN_DIR"
+        fi
+        
+        # Secondary location: build/aarch64/ffmpeg
+        if [ "$BINARIES_FOUND" != "primary" ]; then
+          echo "Looking for binaries in secondary location: $SECONDARY_BIN_DIR"
+          if [ -d "$SECONDARY_BIN_DIR" ]; then
+            ls -la "$SECONDARY_BIN_DIR"/
+            
+            mkdir -p artifacts
+            
+            # Look for ffmpeg or ffmpeg_g
+            if [ -f "$SECONDARY_BIN_DIR/ffmpeg" ]; then
+              echo "✅ Found ffmpeg in $SECONDARY_BIN_DIR"
+              cp "$SECONDARY_BIN_DIR/ffmpeg" artifacts/
+              echo "FFMPEG_FOUND=true" >> $GITHUB_ENV
+            elif [ -f "$SECONDARY_BIN_DIR/ffmpeg_g" ]; then
+              echo "✅ Found ffmpeg_g in $SECONDARY_BIN_DIR"
+              cp "$SECONDARY_BIN_DIR/ffmpeg_g" artifacts/ffmpeg
+              echo "FFMPEG_FOUND=true" >> $GITHUB_ENV
+            else
+              echo "❌ No ffmpeg binary found in $SECONDARY_BIN_DIR"
+            fi
+            
+            # Look for ffprobe
+            if [ -f "$SECONDARY_BIN_DIR/ffprobe" ]; then
+              echo "✅ Found ffprobe in $SECONDARY_BIN_DIR"
+              cp "$SECONDARY_BIN_DIR/ffprobe" artifacts/
+              echo "FFPROBE_FOUND=true" >> $GITHUB_ENV
+            else
+              echo "❌ No ffprobe binary found in $SECONDARY_BIN_DIR"
+            fi
+            
+            if [ "$FFMPEG_FOUND" = "true" ] || [ "$FFPROBE_FOUND" = "true" ]; then
+              echo "BINARIES_FOUND=secondary" >> $GITHUB_ENV
+            fi
+          else
+            echo "❌ Secondary bin directory does not exist: $SECONDARY_BIN_DIR"
+          fi
+        fi
+        
+        # Show what we found
+        if [ -d "artifacts" ]; then
+          echo "Final artifacts:"
+          ls -la artifacts/
+          file artifacts/* || echo "No artifacts to analyze"
+        else
+          echo "❌ No binaries were found in either location"
+          echo "Build may have failed or binaries are in an unexpected location"
+          
+          # Debug: show the entire build directory structure
+          echo "Debug: Complete build directory structure:"
+          find build/ -type f -name "*ffmpeg*" -o -name "*ffprobe*" 2>/dev/null || echo "No ffmpeg/ffprobe files found anywhere in build/"
+          
+          exit 1
+        fi
+
+    - name: Upload build artifacts
+      if: env.BINARIES_FOUND != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: ffmpeg-aarch64-musl-binaries
+        path: artifacts/
+        retention-days: 30
+
+    - name: Display build summary
+      run: |
+        echo "=== BUILD SUMMARY ==="
+        if [ "$BINARIES_FOUND" = "primary" ]; then
+          echo "✅ Build successful - Found binaries in primary location (build/aarch64/prefix/bin)"
+        elif [ "$BINARIES_FOUND" = "secondary" ]; then
+          echo "⚠️  Build partially successful - Found binaries in secondary location (build/aarch64/ffmpeg)"
+          echo "   This might indicate that the final installation/stripping step failed"
+        else
+          echo "❌ Build failed - No binaries found"
+          exit 1
+        fi
+        
+        if [ -d "artifacts" ]; then
+          echo "Artifacts ready for download:"
+          ls -la artifacts/
+        fi
