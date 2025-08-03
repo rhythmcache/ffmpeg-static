@@ -119,9 +119,6 @@ download_sources
 [ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp  "$ROOT_DIR/patches/vapoursynth"/*  "$BUILD_DIR/vapoursynth" 
 
 
-exit 0
-
-
 build_zlib
 build_liblzma
 build_zstd
