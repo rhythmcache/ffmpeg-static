@@ -1894,7 +1894,7 @@ build_pcre2() {
     rm -rf out && mkdir out && cd out
 
     cmake .. \
-        "${CMAKE_COMMON_FLAGS[@]}" \
+        "${COMMON_CMAKE_FLAGS[@]}" \
         -DBUILD_SHARED_LIBS=OFF \
         -DPCRE2_BUILD_PCRE2_16=OFF \
         -DPCRE2_BUILD_PCRE2_32=OFF \
