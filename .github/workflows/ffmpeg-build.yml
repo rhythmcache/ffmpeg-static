@@ -41,7 +41,9 @@ jobs:
           python3-pip \
           python3-venv \
           pipx \
-          subversion
+          subversion \
+          libtool \
+          libtool-bin
 
     - name: Install pipx and meson
       run: |
