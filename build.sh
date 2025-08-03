@@ -111,16 +111,6 @@ for script in "${DOWNLOADER_SCRIPT}" "${BUILD_FUNCTIONS}"; do
     source "$script"
 done
 
-cd "$BUILD_DIR" && git clone --depth 1 https://github.com/libffi/libffi
-
-cd "$BUILD_DIR/libffi"
-libtoolize --force --copy
-aclocal -I m4
-build_libffi
-
-exit 1
-
-: <<'IDK'
 download_sources
 [ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp  "$ROOT_DIR/patches/vapoursynth"/*  "$BUILD_DIR/vapoursynth" 
 build_zlib
@@ -212,4 +202,3 @@ build_chromaprint
 # build_librsvg
 #---------------------------------------------------------------#
 build_ffmpeg
-IDK
