@@ -1669,7 +1669,6 @@ build_xavs2() {
     export AR="$AR_ABS"
     export RANLIB="$RANLIB_ABS"
     export STRIP="$STRIP_ABS"
-    local CROSS_PREFIX="/opt/${HOST}-cross/bin/${HOST}-"
     local ASM_FLAG=""
 
     if [ "$ARCH" != "x86" ] && [ "$ARCH" != "x86_64" ]; then
@@ -1682,7 +1681,6 @@ build_xavs2() {
         ./configure \
         --prefix="$PREFIX" \
         --host="$TARGET" \
-        --cross-prefix="${CROSS_PREFIX}" \
         --extra-cflags="-fPIC -Os -ffunction-sections -fdata-sections -DNDEBUG" \
         --extra-ldflags="-static -Wl,--gc-sections -Wl,--strip-all -Wl,--allow-multiple-definition" \
           $ASM_FLAG \
@@ -1706,7 +1704,6 @@ build_davs2() {
     export AR="$AR_ABS"
     export RANLIB="$RANLIB_ABS"
     export STRIP="$STRIP_ABS"
-    local CROSS_PREFIX="/opt/${HOST}-cross/bin/${HOST}-"
     local ASM_FLAG=""
 
     if [ "$ARCH" != "x86" ] && [ "$ARCH" != "x86_64" ]; then
@@ -1719,11 +1716,9 @@ build_davs2() {
         ./configure \
         --prefix="$PREFIX" \
         --host="$TARGET" \
-        --cross-prefix="${CROSS_PREFIX}" \
         --extra-cflags="-fPIC -Os -ffunction-sections -fdata-sections -DNDEBUG" \
         --extra-ldflags="-static -Wl,--gc-sections -Wl,--strip-all -Wl,--allow-multiple-definition" \
           $ASM_FLAG \
-        --enable-static \
         --sysroot="$SYSROOT" \
         --host="$HOST" \
         --disable-cli
