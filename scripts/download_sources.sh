@@ -190,7 +190,7 @@ download_sources() {
     [ ! -d quirc ] && git clone --depth 1 https://github.com/dlbeer/quirc
     [ ! -d chromaprint ] && git clone --depth 1 https://github.com/acoustid/chromaprint
     [ ! -d libcaca ] && git clone --depth 1 https://github.com/cacalabs/libcaca
-    [ ! -d pixman ] && git clone --depth 1 https://gitlab.freedesktop.org/pixman/pixman
+    [ ! -d pixman ] && git clone --depth 1 https://gitlab.freedesktop.org/pixman/pixman.git
     [ ! -d pango ] && git clone --depth 1 https://github.com/GNOME/pango
     [ ! -d cairo ] && git clone --depth 1 https://gitlab.freedesktop.org/cairo/cairo
     [ ! -d librsvg ] && git clone --depth 1 https://github.com/GNOME/librsvg
