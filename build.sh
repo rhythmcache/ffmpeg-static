@@ -115,6 +115,7 @@ cd "$BUILD_DIR" && git clone --depth 1 https://github.com/libffi/libffi
 
 cd "$BUILD_DIR/libffi"
 libtoolize --force --copy
+aclocal -I m4
 build_libffi
 
 exit 1
