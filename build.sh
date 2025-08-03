@@ -111,15 +111,17 @@ for script in "${DOWNLOADER_SCRIPT}" "${BUILD_FUNCTIONS}"; do
     source "$script"
 done
 
+cd "$BUILD_DIR" && git clone --depth 1 https://github.com/libffi/libffi
 
-
-
-download_sources
-
-[ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp  "$ROOT_DIR/patches/vapoursynth"/*  "$BUILD_DIR/vapoursynth" 
+cd "$BUILD_DIR/libffi"
+libtoolize --force --copy
 build_libffi
+
 exit 1
+
 : <<'IDK'
+download_sources
+[ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp  "$ROOT_DIR/patches/vapoursynth"/*  "$BUILD_DIR/vapoursynth" 
 build_zlib
 build_liblzma
 build_zstd
