@@ -112,12 +112,12 @@ for script in "${DOWNLOADER_SCRIPT}" "${BUILD_FUNCTIONS}"; do
 done
 
 download_sources
+build_libcaca
 [ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp  "$ROOT_DIR/patches/vapoursynth"/*  "$BUILD_DIR/vapoursynth" 
 build_zlib
 build_liblzma
 build_zstd
 build_pcre2
-build_libcaca
 build_openssl
 build_rtmp
 build_libgsm
