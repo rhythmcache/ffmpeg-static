@@ -141,7 +141,8 @@ download_sources() {
     # Build clone commands for git repositories
     {
         [ ! -d freetype ] && echo "git clone --depth 1 '$FREETYPE_URL' freetype"
-        [ ! -d openjpeg ] && echo "git clone --depth 1 https://github.com/libjpeg-turbo/libjpeg-turbo openjpeg"
+        [ ! -d openjpeg ] && echo "git clone --depth 1 https://github.com/uclouvain/openjpeg openjpeg"
+        [ ! -d libjpeg ] && echo "git clone --depth 1 https://github.com/libjpeg-turbo/libjpeg-turbo"
         [ ! -d libxml2 ] && echo "git clone --depth 1 '$LIBXML2_URL' libxml2"
         [ ! -d harfbuzz ] && echo "git clone --depth 1 '$HARFBUZZ_URL' harfbuzz"
         [ ! -d libwebp ] && echo "git clone --depth 1 '$WEBP_URL' libwebp"
