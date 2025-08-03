@@ -118,6 +118,7 @@ build_liblzma
 build_zstd
 build_pcre2
 build_openssl
+build_rtmp
 build_libgsm
 build_x264
 build_x265
@@ -185,7 +186,6 @@ build_libbs2b
 build_libssh
 build_libv4l
 build_libgme
-build_rtmp
 #build_llvm ( tmkc ye kya ho gaya )
 #build_opencl ( kya chutiyapa hai , iske liye ab mai llvm compile karun? )
 build_highway
