@@ -1871,7 +1871,6 @@ EOF
 
 build_libffi() {
     cd "$BUILD_DIR/libffi"
-    autoreconf -fiv
     mkdir -p "build" && cd build
     ../configure \
     --prefix="$PREFIX" \
