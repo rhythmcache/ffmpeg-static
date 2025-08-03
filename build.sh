@@ -178,7 +178,7 @@ build_xavs
 build_xavs2
 build_davs2
 build_vvenc
-build_rav1e ( not compiling for aarch64)
+#build_rav1e ( not compiling for aarch64)
 #build_vvdec # ( not needed )
 build_vapoursynth # ( baad mein dekhte hain isse )
 build_libffi
