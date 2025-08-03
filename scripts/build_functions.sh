@@ -1425,7 +1425,7 @@ cp "configure.ac" "configure.bak"
 
 build_libilbc() {
   echo "Building libilbc for $ARCH..."
-  cd "$BUILD_DIR/libilibc" || exit 1
+  cd "$BUILD_DIR/libilbc" || exit 1
   rm -rf build
   mkdir build && cd build || exit 1
 
