@@ -2318,6 +2318,9 @@ build_libcaca() {
     ./configure \
         --host="$HOST" \
         --disable-java \
+        --disable-ruby \
+        --disable-python \
+         --disable-csharp \
          --disable-cxx \
         --disable-doc \
         --disable-imlib2 \
