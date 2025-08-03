@@ -116,6 +116,7 @@ download_sources
 build_zlib
 build_liblzma
 build_zstd
+build_pcre2
 build_openssl
 build_libgsm
 build_x264
