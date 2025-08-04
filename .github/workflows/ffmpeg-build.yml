@@ -15,12 +15,15 @@ jobs:
           - arch: x86
             toolchain_url: "https://github.com/rhythmcache/musl-toolchain/releases/download/musl-toolchains-20250803-094319/musl-cross-i686-linux-musl.tar.gz"
             cross_prefix: "i686-linux-musl"
+            creates_subdirectory: true
           - arch: aarch64
             toolchain_url: "https://github.com/bazel-contrib/musl-toolchain/releases/download/v0.1.27/musl-1.2.3-platform-x86_64-unknown-linux-gnu-target-aarch64-linux-musl.tar.gz"
             cross_prefix: "aarch64-linux-musl"
+            creates_subdirectory: false
           - arch: x86_64
             toolchain_url: "https://github.com/bazel-contrib/musl-toolchain/releases/download/v0.1.27/musl-1.2.3-platform-x86_64-unknown-linux-gnu-target-x86_64-linux-musl.tar.gz"
             cross_prefix: "x86_64-linux-musl"
+            creates_subdirectory: false
     
     name: Build ${{ matrix.arch }}
     
@@ -86,36 +89,57 @@ jobs:
     - name: Extract toolchain and setup PATH
       run: |
         echo "Extracting toolchain..."
-        tar -xzf musl-cross-${{ matrix.cross_prefix }}.tar.gz
         
-        echo "Finding extracted directory..."
+        # Create a dedicated directory for this toolchain
+        mkdir -p toolchain-${{ matrix.arch }}
+        cd toolchain-${{ matrix.arch }}
+        
+        # Extract the toolchain
+        tar -xzf ../musl-cross-${{ matrix.cross_prefix }}.tar.gz
+        
+        echo "Contents after extraction:"
         ls -la
         
-        # Find the extracted directory (it might have a different name)
-        TOOLCHAIN_DIR=$(find . -maxdepth 1 -type d -name "*${{ matrix.cross_prefix }}*" | head -1)
-        if [ -z "$TOOLCHAIN_DIR" ]; then
-          echo "Looking for any extracted directory..."
-          TOOLCHAIN_DIR=$(find . -maxdepth 1 -type d ! -name ".*" ! -name "_work" | grep -v "^\\.$" | head -1)
+        # Determine the toolchain bin directory
+        if [ "${{ matrix.creates_subdirectory }}" = "true" ]; then
+          # For toolchains that create a subdirectory (like rhythmcache i686)
+          TOOLCHAIN_SUBDIR=$(find . -maxdepth 1 -type d -name "*${{ matrix.cross_prefix }}*" | head -1)
+          if [ -z "$TOOLCHAIN_SUBDIR" ]; then
+            echo "Looking for any extracted subdirectory..."
+            TOOLCHAIN_SUBDIR=$(find . -maxdepth 1 -type d ! -name "." | head -1)
+          fi
+          echo "Toolchain subdirectory: $TOOLCHAIN_SUBDIR"
+          TOOLCHAIN_BIN="$PWD/$TOOLCHAIN_SUBDIR/bin"
+        else
+          # For toolchains that extract directly to current directory (bazel-contrib)
+          echo "Toolchain extracts directly to current directory"
+          TOOLCHAIN_BIN="$PWD/bin"
         fi
         
-        echo "Toolchain directory: $TOOLCHAIN_DIR"
-        ls -la "$TOOLCHAIN_DIR"/
+        echo "Toolchain bin directory: $TOOLCHAIN_BIN"
+        ls -la "$TOOLCHAIN_BIN"/
         
-        # Export toolchain bin to PATH
-        TOOLCHAIN_BIN="$PWD/$TOOLCHAIN_DIR/bin"
-        echo "Adding to PATH: $TOOLCHAIN_BIN"
+        # Add toolchain bin to PATH for subsequent steps
         echo "$TOOLCHAIN_BIN" >> $GITHUB_PATH
         
-        # Also export for current step
+        # Also export for current step verification
         export PATH="$TOOLCHAIN_BIN:$PATH"
         export PATH="$HOME/.local/bin:$PATH"
         
         # Verify toolchain
         echo "Verifying toolchain..."
-        ls -la "$TOOLCHAIN_BIN"/
         if [ -f "$TOOLCHAIN_BIN/${{ matrix.cross_prefix }}-gcc" ]; then
+          echo "✅ Found GCC compiler"
           "$TOOLCHAIN_BIN/${{ matrix.cross_prefix }}-gcc" --version
+        else
+          echo "❌ GCC compiler not found at expected location"
+          echo "Available files in bin directory:"
+          ls -la "$TOOLCHAIN_BIN"/ || echo "Bin directory does not exist"
+          exit 1
         fi
+        
+        # Go back to main directory
+        cd ..
 
     - name: Execute build script
       id: build
@@ -130,6 +154,9 @@ jobs:
         echo "Starting build with ${{ matrix.arch }} target..."
         echo "Current PATH: $PATH"
         echo "Current directory: $(pwd)"
+        
+        # Verify the cross-compiler is accessible
+        which ${{ matrix.cross_prefix }}-gcc || echo "Warning: ${{ matrix.cross_prefix }}-gcc not found in PATH"
         
         # Execute the build script
         ./build.sh ${{ matrix.arch }}
