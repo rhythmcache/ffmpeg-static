@@ -191,7 +191,7 @@ download_sources() {
         [ ! -d pango ] && echo "git clone --depth 1 https://github.com/GNOME/pango pango"
         [ ! -d cairo ] && echo "git clone --depth 1 https://gitlab.freedesktop.org/cairo/cairo cairo"
         [ ! -d librsvg ] && echo "git clone --depth 1 https://github.com/GNOME/librsvg librsvg"
-        [ ! -d ffmpeg ] && echo "git clone --depth 1 https://github.com/FFmpeg/FFmpeg ffmpeg"
+        [ ! -d ffmpeg ] && echo "git clone https://github.com/FFmpeg/FFmpeg ffmpeg && cd ffmpeg && git checkout b849ac0"
     } > "$clone_cmds"
 
     # Execute downloads in parallel
