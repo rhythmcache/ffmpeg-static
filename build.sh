@@ -214,11 +214,12 @@ download_sources
 build_libcaca
 [ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp  "$ROOT_DIR/patches/vapoursynth"/*  "$BUILD_DIR/vapoursynth" 
 build_zlib
+build_openssl
+build_libsrt
 build_openjpeg
 build_liblzma
 build_zstd
 build_pcre2
-build_openssl
 build_rtmp
 build_libgsm
 build_x264
@@ -258,7 +259,6 @@ build_vidstab
 build_soxr
 build_openmpt
 build_svtav1
-build_libsrt
 build_libzmq
 build_libplacebo
 build_librist
