@@ -69,8 +69,8 @@ SIZE_CFLAGS="-Os -ffunction-sections -fdata-sections"
 SIZE_CXXFLAGS="-Os -ffunction-sections -fdata-sections" 
 SIZE_LDFLAGS="-Wl,--gc-sections -Wl,--strip-all"
 export LTO_FLAGS=""
-export CFLAGS="-static $SIZE_CFLAGS -DNDEBUG"
-export CXXFLAGS="-static $SIZE_CXXFLAGS -DNDEBUG" 
+export CFLAGS="-static $SIZE_CFLAGS -DNDEBUG -fPIC"
+export CXXFLAGS="-static $SIZE_CXXFLAGS -DNDEBUG -fPIC" 
 export LDFLAGS="-static $SIZE_LDFLAGS -Wl,--allow-multiple-definition"
 export SYSROOT=$(${CC_ABS} --print-sysroot)
 BUILD_DIR="$ROOT_DIR/build/$ARCH"
@@ -131,8 +131,8 @@ build_ffmpeg() {
         "${ASM_FLAGS[@]}" \
         --target-os="linux" \
         --pkg-config-flags="--static" \
-        --extra-cflags="-I$PREFIX/include" \
-        --extra-ldflags="-L$PREFIX/lib" \
+        --extra-cflags="-I$PREFIX/include -static -Os -ffunction-sections -fdata-sections" \
+        --extra-ldflags="-L$PREFIX/lib -static -Wl,--gc-sections -Wl,--strip-all -Wl,--allow-multiple-definition" \
         --extra-libs="-lm -lpthread -lstdc++ -lcrypto -lz -lfftw3 -lssp" \
         --enable-static \
         --disable-shared \
