@@ -59,6 +59,7 @@ jobs:
           pipx \
           subversion \
           libtool \
+          gperf \
           libtool-bin
 
     - name: Install pipx and meson
