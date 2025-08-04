@@ -161,7 +161,6 @@ build_ffmpeg() {
         --enable-libvorbis \
         --enable-libopus \
         --enable-libfdk-aac \
-        --enable-libspeex \
         --enable-libtwolame \
         --enable-libsoxr \
         --enable-libvo-amrwbenc \
@@ -177,7 +176,6 @@ build_ffmpeg() {
         --enable-libfribidi \
         --enable-libass \
         --enable-libharfbuzz \
-        --enable-libbluray \
         --enable-libxml2 \
         --enable-openssl \
         --enable-zlib \
