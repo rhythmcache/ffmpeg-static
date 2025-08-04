@@ -125,6 +125,8 @@ build_x264() {
     cd "$BUILD_DIR/x264"
     (make clean && make distclean) || true
 
+     [ "$ARCH" = "x86" ] && ASM_FLAGS="--disable-asm"
+
     ./configure \
         --prefix="$PREFIX" \
         --host="$HOST" \
@@ -133,6 +135,7 @@ build_x264() {
         --disable-cli \
         --disable-opencl \
         --enable-pic \
+        ${ASM_FLAGS} \
         --extra-cflags="$CFLAGS -I$PREFIX/include" \
         --extra-ldflags="$LDFLAGS -L$PREFIX/lib"
 
@@ -677,14 +680,15 @@ build_libass() {
     cd "$BUILD_DIR/libass"
 (make clean && make distclean) || true
 
+    [ "$ARCH" = "x86" ] && ASM_FLAGS="--disable-asm"
+
     ./configure \
         --prefix="$PREFIX" \
         --host="$HOST" \
         --enable-static \
         --disable-shared \
-        --disable-require-system-font-provider \
-        CFLAGS="$CFLAGS -I$PREFIX/include" \
-        LDFLAGS="$LDFLAGS -L$PREFIX/lib"
+           ${ASM_FLAGS} \
+        --disable-require-system-font-provider
 
     make -j"$(nproc)"
     make install
@@ -945,60 +949,22 @@ build_openjpeg() {
 
     cmake .. \
         "${COMMON_CMAKE_FLAGS[@]}" \
-        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-        -DBUILD_SHARED_LIBS=OFF \
-        -DBUILD_JPIP=OFF \
-        -DBUILD_JPWL=OFF \
-        -DBUILD_DOC=OFF \
+      -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+       -DCMAKE_BUILD_TYPE=Release \
+       -DBUILD_SHARED_LIBS=OFF \
         -DBUILD_CODEC=OFF \
-        -DBUILD_THIRDPARTY=OFF \
-        -DBUILD_TESTING=OFF \
-        -DBUILD_PKGCONFIG_FILES=ON
+      -DBUILD_JPWL=OFF \
+        -DBUILD_JPIP=OFF \
+       -DBUILD_THIRDPARTY=OFF \
+        -DBUILD_DOC=OFF \
+       -DBUILD_TESTING=OFF
+
 
     make -j"$(nproc)"
     make install
 
     echo "✅ OpenJPEG built successfully"
 }
-
-
-build_libjpeg() {
-    echo "Building openjpeg for $ARCH..."
-    cd "$BUILD_DIR/openjpeg"
-    rm -rf build
-
-   case "$ARCH" in
-  x86_64|x86)
-    WITH_SIMD=ON
-    ;;
-  arm*|aarch64)
-    WITH_SIMD=OFF
-    ;;
-  *)
-    WITH_SIMD=OFF
-    ;;
-esac
-
-    mkdir -p build && cd build
-
-    cmake .. \
-        "${COMMON_CMAKE_FLAGS[@]}" \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DENABLE_SHARED=OFF \
-        -DENABLE_STATIC=ON \
-        -DWITH_SIMD="${WITH_SIMD}" \
-        -DWITH_TOOLS=OFF \
-         -DWITH_TESTS=OFF \
-         -DWITH_FUZZ=OFF \
-         -DWITH_TURBOJPEG=OFF
-
-
-    make -j"$(nproc)"
-    make install
-
-    echo "✔ libjpeg built successfully"
-}
-
 
 
 build_libwebp() {
@@ -1571,7 +1537,7 @@ build_xvidcore() {
   echo "Building xvidcore..."
 
   cd "$BUILD_DIR/xvidcore/build/generic" || exit 1
-  make distclean || true
+  (make distclean && make clean)|| true
 
   ./configure \
     --host="$HOST" \
@@ -1582,8 +1548,9 @@ build_xvidcore() {
     AR="$AR_ABS" \
     RANLIB="$RANLIB_ABS" \
     STRIP="$STRIP_ABS" \
-    CFLAGS="-static -Os -ffunction-sections -fdata-sections -DNDEBUG" \
-    LDFLAGS="-static -Wl,--gc-sections -Wl,--strip-all -Wl,--allow-multiple-definition" || exit 1
+    CFLAGS="$CFLAGS" \
+    --disable-assembly \
+    LDFLAGS="$LDFLAGS" || exit 1
 
   make -j"$(nproc)" || exit 1
   make install || exit 1
@@ -2383,14 +2350,17 @@ build_fftw() {
 
     rm -rf build && mkdir -p build && cd build
 
+    ASM_FLAGS=()
+   [ "$ARCH" != "x86_64" ] && ASM_FLAGS=(-DENABLE_SSE=OFF -DENABLE_AVX=OFF)
+
     cmake .. \
         -DCMAKE_INSTALL_PREFIX="$PREFIX" \
         -DBUILD_SHARED_LIBS=OFF \
         -DENABLE_FLOAT=OFF \
         -DENABLE_LONG_DOUBLE=OFF \
         -DENABLE_THREADS=OFF \
-        -DWITH_PIC=ON \
-        "${COMMON_CMAKE_FLAGS[@]}"
+        "${COMMON_CMAKE_FLAGS[@]}" \
+        "${ASM_FLAGS[@]}"
 
     make -j"$(nproc)"
     make install
@@ -2401,6 +2371,7 @@ build_chromaprint() {
     cd "$BUILD_DIR/chromaprint"
     echo "Building Chromaprint for $ARCH.........."
 
+
     rm -rf build && mkdir -p build && cd build
 
     cmake .. \
@@ -2408,7 +2379,7 @@ build_chromaprint() {
         -DBUILD_SHARED_LIBS=OFF \
         -DBUILD_TOOLS=OFF \
         -DBUILD_TESTS=OFF \
-        -DFFT_BACKEND=fftw \
+        -DFFT_LIB=fftw3 \
         -DCMAKE_PREFIX_PATH="$PREFIX" \
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         "${COMMON_CMAKE_FLAGS[@]}"
@@ -2672,100 +2643,4 @@ EOF
 
     ninja -C build
     ninja -C build install
-}
-
-
-build_ffmpeg() {
-    echo "Building FFmpeg for $ARCH..."
-    cd "$BUILD_DIR/ffmpeg"
-      (make clean && make distclean) || true
-    ./configure \
-        --enable-cross-compile \
-        --prefix="$PREFIX" \
-        --host-cc=/usr/bin/gcc \
-        --cc="$CC_ABS" \
-        --cxx="$CXX_ABS" \
-        --ar="$AR_ABS" \
-        --nm="$NM_ABS" \
-        --strip="$STRIP_ABS" \
-        --ranlib="$RANLIB_ABS" \
-        --arch="$ARCH" \
-        --target-os="linux" \
-        --pkg-config-flags="--static" \
-        --extra-cflags="-I$PREFIX/include" \
-        --extra-ldflags="-L$PREFIX/lib" \
-        --extra-libs="-lm -lpthread -lstdc++ -lcrypto -lz" \
-        --enable-static \
-        --disable-shared \
-        --disable-debug \
-        --disable-doc \
-        --enable-gpl \
-        --enable-version3 \
-        --enable-nonfree \
-        --enable-libx264 \
-        --enable-libx265 \
-        --enable-libvpx \
-        --enable-libaom \
-        --enable-libdav1d \
-        --enable-libharfbuzz \
-        --enable-libbs2b \
-        --enable-libgsm \
-        --enable-libtheora \
-        --enable-libopenjpeg \
-        --enable-libwebp \
-        --enable-libxvid \
-        --enable-libkvazaar \
-        --enable-libxavs \
-        --enable-libxavs2 \
-        --enable-libdavs2 \
-        --enable-libmp3lame \
-        --enable-libvorbis \
-        --enable-libopus \
-        --enable-libfdk-aac \
-        --enable-libspeex \
-        --enable-libtwolame \
-        --enable-libsoxr \
-        --enable-libvo-amrwbenc \
-        --enable-libopencore-amrnb \
-        --enable-libopencore-amrwb \
-        --enable-libvvenc \
-        --enable-libilbc \
-        --enable-libcodec2 \
-        --enable-libmysofa \
-        --enable-libopenmpt \
-        --enable-libfreetype \
-        --enable-libfontconfig \
-        --enable-libfribidi \
-        --enable-libass \
-        --enable-libharfbuzz \
-        --enable-libbluray \
-        --enable-libxml2 \
-        --enable-openssl \
-        --enable-zlib \
-        --enable-bzlib \
-        --enable-libsrt \
-        --enable-libzmq \
-        --enable-librist \
-        --enable-libaribb24 \
-        --enable-libvmaf \
-        --enable-libzimg \
-        --enable-liblensfun \
-        --enable-libflite \
-        --enable-libssh \
-        --enable-libsvtav1 \
-        --enable-libuavs3d \
-        --enable-libv4l2 \
-        --enable-librtmp \
-        --enable-libgme \
-        --enable-libjxl \
-        --enable-vapoursynth \
-        --enable-libqrencode \
-        --enable-libquirc \
-        --enable-libcaca
-
-
-    make -j"$(nproc)"
-    make install
-
-    echo "✔ FFmpeg built successfully"
 }
