@@ -114,7 +114,7 @@ build_openssl() {
 
     make -j"$(nproc)" build_libs
     make install_sw
-
+    ([ "$ARCH" = "x86_64" ] && cp -r "$PREFIX/lib64/"* "$PREFIX/lib/") || true
     echo "✔ OpenSSL built successfully"
 }
 
@@ -951,24 +951,21 @@ build_openjpeg() {
 
     cd "$BUILD_DIR/openjpeg"
     rm -rf build && mkdir -p build && cd build
-
     cmake .. \
         "${COMMON_CMAKE_FLAGS[@]}" \
       -DCMAKE_INSTALL_PREFIX="$PREFIX" \
        -DCMAKE_BUILD_TYPE=Release \
        -DBUILD_SHARED_LIBS=OFF \
-        -DBUILD_CODEC=OFF \
-      -DBUILD_JPWL=OFF \
-        -DBUILD_JPIP=OFF \
+       -DBUILD_STATIC_LIBS=ON \
+       -DBUILD_CODEC=OFF \
+       -DBUILD_JAVA=OFF \
+       -DBUILD_VIEWER=OFF \
        -DBUILD_THIRDPARTY=OFF \
-        -DBUILD_DOC=OFF \
        -DBUILD_TESTING=OFF
-
-
     make -j"$(nproc)"
     make install
 
-    echo "✅ OpenJPEG built successfully"
+    echo " OpenJPEG built successfully"
 }
 
 
