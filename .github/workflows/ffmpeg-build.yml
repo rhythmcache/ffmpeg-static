@@ -7,6 +7,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86, aarch64, x86_64]
+        include:
+          - arch: x86
+            toolchain_url: "https://github.com/rhythmcache/musl-toolchain/releases/download/musl-toolchains-20250803-094319/musl-cross-i686-linux-musl.tar.gz"
+            cross_prefix: "i686-linux-musl"
+          - arch: aarch64
+            toolchain_url: "https://github.com/rhythmcache/musl-toolchain/releases/download/musl-toolchains-20250803-094319/musl-cross-aarch64-linux-musl.tar.gz"
+            cross_prefix: "aarch64-linux-musl"
+          - arch: x86_64
+            toolchain_url: "https://github.com/rhythmcache/musl-toolchain/releases/download/musl-toolchains-20250803-094319/musl-cross-x86_64-linux-musl.tar.gz"
+            cross_prefix: "x86_64-linux-musl"
+    
+    name: Build ${{ matrix.arch }}
     
     steps:
     - name: Checkout repository
@@ -56,24 +72,24 @@ jobs:
 
     - name: Download musl toolchain
       run: |
-        echo "Downloading musl toolchain..."
-        wget -O musl-cross-aarch64-linux-musl.tar.gz \
-          "https://github.com/rhythmcache/musl-toolchain/releases/download/musl-toolchains-20250803-094319/musl-cross-aarch64-linux-musl.tar.gz"
+        echo "Downloading musl toolchain for ${{ matrix.arch }}..."
+        wget -O musl-cross-${{ matrix.cross_prefix }}.tar.gz \
+          "${{ matrix.toolchain_url }}"
         
         echo "Verifying download..."
-        ls -la musl-cross-aarch64-linux-musl.tar.gz
-        file musl-cross-aarch64-linux-musl.tar.gz
+        ls -la musl-cross-${{ matrix.cross_prefix }}.tar.gz
+        file musl-cross-${{ matrix.cross_prefix }}.tar.gz
 
     - name: Extract toolchain and setup PATH
       run: |
         echo "Extracting toolchain..."
-        tar -xzf musl-cross-aarch64-linux-musl.tar.gz
+        tar -xzf musl-cross-${{ matrix.cross_prefix }}.tar.gz
         
         echo "Finding extracted directory..."
         ls -la
         
         # Find the extracted directory (it might have a different name)
-        TOOLCHAIN_DIR=$(find . -maxdepth 1 -type d -name "*aarch64*musl*" | head -1)
+        TOOLCHAIN_DIR=$(find . -maxdepth 1 -type d -name "*${{ matrix.cross_prefix }}*" | head -1)
         if [ -z "$TOOLCHAIN_DIR" ]; then
           echo "Looking for any extracted directory..."
           TOOLCHAIN_DIR=$(find . -maxdepth 1 -type d ! -name ".*" ! -name "_work" | grep -v "^\\.$" | head -1)
@@ -94,11 +110,13 @@ jobs:
         # Verify toolchain
         echo "Verifying toolchain..."
         ls -la "$TOOLCHAIN_BIN"/
-        if [ -f "$TOOLCHAIN_BIN/aarch64-linux-musl-gcc" ]; then
-          "$TOOLCHAIN_BIN/aarch64-linux-musl-gcc" --version
+        if [ -f "$TOOLCHAIN_BIN/${{ matrix.cross_prefix }}-gcc" ]; then
+          "$TOOLCHAIN_BIN/${{ matrix.cross_prefix }}-gcc" --version
         fi
 
     - name: Execute build script
+      id: build
+      continue-on-error: true
       run: |
         # Ensure PATH includes both toolchain and pipx
         export PATH="$HOME/.local/bin:$PATH"
@@ -106,20 +124,30 @@ jobs:
         # Make build script executable
         chmod +x ./build.sh
         
-        echo "Starting build with aarch64 target..."
+        echo "Starting build with ${{ matrix.arch }} target..."
         echo "Current PATH: $PATH"
         echo "Current directory: $(pwd)"
         
         # Execute the build script
-        ./build.sh aarch64
+        ./build.sh ${{ matrix.arch }}
+
+    - name: Upload config.log on build failure
+      if: steps.build.outcome == 'failure'
+      uses: actions/upload-artifact@v4
+      with:
+        name: config-log-${{ matrix.arch }}-failure
+        path: build/${{ matrix.arch }}/ffmpeg/ffbuild/config.log
+        if-no-files-found: warn
+        retention-days: 7
 
     - name: Check build results and collect binaries
+      if: steps.build.outcome == 'success'
       run: |
         echo "Checking build results..."
         
-        # Primary location: build/aarch64/prefix/bin
-        PRIMARY_BIN_DIR="build/aarch64/prefix/bin"
-        SECONDARY_BIN_DIR="build/aarch64/ffmpeg"
+        # Primary location: build/${{ matrix.arch }}/prefix/bin
+        PRIMARY_BIN_DIR="build/${{ matrix.arch }}/prefix/bin"
+        SECONDARY_BIN_DIR="build/${{ matrix.arch }}/ffmpeg"
         
         echo "Looking for binaries in primary location: $PRIMARY_BIN_DIR"
         if [ -d "$PRIMARY_BIN_DIR" ]; then
@@ -140,7 +168,7 @@ jobs:
           echo "❌ Primary bin directory does not exist: $PRIMARY_BIN_DIR"
         fi
         
-        # Secondary location: build/aarch64/ffmpeg
+        # Secondary location: build/${{ matrix.arch }}/ffmpeg
         if [ "$BINARIES_FOUND" != "primary" ]; then
           echo "Looking for binaries in secondary location: $SECONDARY_BIN_DIR"
           if [ -d "$SECONDARY_BIN_DIR" ]; then
@@ -195,20 +223,21 @@ jobs:
         fi
 
     - name: Upload build artifacts
-      if: env.BINARIES_FOUND != ''
+      if: steps.build.outcome == 'success' && env.BINARIES_FOUND != ''
       uses: actions/upload-artifact@v4
       with:
-        name: ffmpeg-aarch64-musl-binaries
+        name: ffmpeg-${{ matrix.arch }}-musl-binaries
         path: artifacts/
         retention-days: 30
 
     - name: Display build summary
+      if: steps.build.outcome == 'success'
       run: |
-        echo "=== BUILD SUMMARY ==="
+        echo "=== BUILD SUMMARY for ${{ matrix.arch }} ==="
         if [ "$BINARIES_FOUND" = "primary" ]; then
-          echo "✅ Build successful - Found binaries in primary location (build/aarch64/prefix/bin)"
+          echo "✅ Build successful - Found binaries in primary location (build/${{ matrix.arch }}/prefix/bin)"
         elif [ "$BINARIES_FOUND" = "secondary" ]; then
-          echo "⚠️  Build partially successful - Found binaries in secondary location (build/aarch64/ffmpeg)"
+          echo "⚠️  Build partially successful - Found binaries in secondary location (build/${{ matrix.arch }}/ffmpeg)"
           echo "   This might indicate that the final installation/stripping step failed"
         else
           echo "❌ Build failed - No binaries found"
@@ -219,3 +248,10 @@ jobs:
           echo "Artifacts ready for download:"
           ls -la artifacts/
         fi
+
+    - name: Mark build as failed if build step failed
+      if: steps.build.outcome == 'failure'
+      run: |
+        echo "❌ Build failed for ${{ matrix.arch }}"
+        echo "Config log should be available in the artifacts if it exists"
+        exit 1
