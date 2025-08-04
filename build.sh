@@ -111,12 +111,12 @@ for script in "${DOWNLOADER_SCRIPT}" "${BUILD_FUNCTIONS}"; do
     source "$script"
 done
 
-
-build_debug_ffmpeg() {
-    echo "Building FFmpeg for $ARCH (minimal test build)..."
+build_ffmpeg() {
+    echo "Building FFmpeg for $ARCH..."
     cd "$BUILD_DIR/ffmpeg"
-    (make clean && make distclean) || true
-    
+    ASM_FLAGS=()
+[ "$ARCH" = "x86" ] && ASM_FLAGS=(--disable-x86asm --disable-sse --disable-sse2 --disable-sse3 --disable-ssse3 --disable-avx --disable-avx2)
+      (make clean && make distclean) || true
     ./configure \
         --enable-cross-compile \
         --prefix="$PREFIX" \
@@ -128,25 +128,81 @@ build_debug_ffmpeg() {
         --strip="$STRIP_ABS" \
         --ranlib="$RANLIB_ABS" \
         --arch="$ARCH" \
+        "${ASM_FLAGS[@]}" \
         --target-os="linux" \
         --pkg-config-flags="--static" \
         --extra-cflags="-I$PREFIX/include" \
-        --extra-ldflags="-L$PREFIX/lib $LDFLAGS" \
-        --extra-libs="-lm -lpthread -lstdc++ -lcrypto -lz" \
+        --extra-ldflags="-L$PREFIX/lib" \
+        --extra-libs="-lm -lpthread -lstdc++ -lcrypto -lz -lfftw3" \
         --enable-static \
         --disable-shared \
         --disable-debug \
         --disable-doc \
-        --disable-x86asm \
         --enable-gpl \
         --enable-version3 \
         --enable-nonfree \
+        --enable-libx264 \
+        --enable-libx265 \
+        --enable-libvpx \
+        --enable-libaom \
+        --enable-libdav1d \
+        --enable-libharfbuzz \
+        --enable-libbs2b \
+        --enable-libgsm \
+        --enable-libtheora \
+        --enable-libopenjpeg \
+        --enable-libwebp \
+        --enable-libxvid \
+        --enable-libkvazaar \
+        --enable-libxavs \
+        --enable-libxavs2 \
+        --enable-libdavs2 \
+        --enable-libmp3lame \
+        --enable-libvorbis \
+        --enable-libopus \
+        --enable-libfdk-aac \
         --enable-libspeex \
+        --enable-libtwolame \
+        --enable-libsoxr \
+        --enable-libvo-amrwbenc \
+        --enable-libopencore-amrnb \
+        --enable-libopencore-amrwb \
+        --enable-libvvenc \
+        --enable-libilbc \
         --enable-libcodec2 \
+        --enable-libmysofa \
+        --enable-libopenmpt \
+        --enable-libfreetype \
+        --enable-libfontconfig \
+        --enable-libfribidi \
+        --enable-libass \
+        --enable-libharfbuzz \
         --enable-libbluray \
         --enable-libxml2 \
         --enable-openssl \
-        --enable-zlib
+        --enable-zlib \
+        --enable-bzlib \
+        --enable-libsrt \
+        --enable-libzmq \
+        --enable-librist \
+        --enable-libaribb24 \
+        --enable-libvmaf \
+        --enable-libzimg \
+        --enable-liblensfun \
+        --enable-libflite \
+        --enable-libssh \
+        --enable-libsvtav1 \
+        --enable-libuavs3d \
+        --enable-libv4l2 \
+        --enable-librtmp \
+        --enable-libgme \
+        --enable-libjxl \
+        --enable-vapoursynth \
+        --enable-libqrencode \
+        --enable-libquirc \
+        --enable-libcaca \
+        --enable-chromaprint
+
 
     make -j"$(nproc)"
     make install
@@ -155,15 +211,6 @@ build_debug_ffmpeg() {
 }
 
 download_sources
-build_zlib
-build_openssl
-build_libexpat
-build_libxml2
-build_udfread
-build_bluray
-build_speex
-build_libcodec2
-: <'IDK'
 build_libcaca
 [ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp  "$ROOT_DIR/patches/vapoursynth"/*  "$BUILD_DIR/vapoursynth" 
 build_zlib
@@ -247,8 +294,8 @@ build_highway
 build_libjxl
 build_libqrencode
 build_quirc
-#build_fftw
-#build_chromaprint
+build_fftw
+build_chromaprint
 #----------- These 4 are needed to build librsvg---------------#
 # build_pixman
 # build_cairo
@@ -257,5 +304,3 @@ build_quirc
 # build_librsvg
 #---------------------------------------------------------------#
 build_ffmpeg
-IDK 
-build_debug_ffmpeg
