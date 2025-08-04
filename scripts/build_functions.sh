@@ -297,7 +297,7 @@ EOF
 build_libvpx() {
     echo "Building libvpx for $ARCH..."
     cd "$BUILD_DIR/libvpx"
-    (make clean && make distclean) || true
+
     find . -name '*.d' -delete  # <- stale dependency fix
 
     case "$ARCH" in
@@ -308,6 +308,8 @@ build_libvpx() {
       riscv64)  VPX_TARGET="generic-gnu" ;;  # closest match
       *)        echo "Unsupported arch for libvpx"; exit 1 ;;
     esac
+
+       (make clean && make distclean) || true
 
     ./configure \
         --prefix="$PREFIX" \
@@ -322,6 +324,7 @@ build_libvpx() {
         --enable-vp9 \
         --enable-static \
         --disable-shared \
+        --disable-runtime-cpu-detect \
         --extra-cflags="$CFLAGS -I$PREFIX/include"
 
     make -j"$(nproc)"
@@ -461,6 +464,8 @@ build_aom() {
   rm -rf out
   mkdir -p out && cd out
 
+  [ "$ARCH" = "x86" ] && ASM_FLAGS=(-DENABLE_NASM=OFF)
+
   cmake .. \
     -DCMAKE_INSTALL_PREFIX="$PREFIX" \
     -DCMAKE_SYSTEM_NAME=Linux \
@@ -476,8 +481,8 @@ build_aom() {
     -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS -L$PREFIX/lib" \
     -DBUILD_SHARED_LIBS=OFF \
     -DENABLE_TESTS=OFF \
-    -DENABLE_NASM=OFF \
-    -DENABLE_DOCS=OFF
+    -DENABLE_DOCS=OFF \
+    "${ASM_FLAGS[@]}"
 
   make -j"$(nproc)" && make install
   echo "✔ libaom (AV1) built successfully"
