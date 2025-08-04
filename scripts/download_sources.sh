@@ -20,7 +20,6 @@ LIBPNG_VERSION="libpng-1.6.50"
 FONTCONFIG_VERSION="fontconfig-2.16.0"
 FRIBIDI_VERSION="fribidi-1.0.16"
 BLURAY_VERSION="libbluray-master"
-THEORA_VERSION="libtheora-1.2.0"
 SPEEX_VERSION="speex-1.2.1"
 LIBEXPAT_VERSION="expat-2.7.1"
 BUDFREAD_VERSION="libudfread-master"
@@ -58,7 +57,6 @@ LIBPNG_URL="https://download.sourceforge.net/libpng/${LIBPNG_VERSION}.tar.gz"
 FONTCONFIG_URL="https://www.freedesktop.org/software/fontconfig/release/${FONTCONFIG_VERSION}.tar.xz"
 FRIBIDI_URL="https://github.com/fribidi/fribidi/releases/download/v1.0.16/${FRIBIDI_VERSION}.tar.xz"
 BLURAY_URL="https://code.videolan.org/videolan/libbluray/-/archive/master/${BLURAY_VERSION}.tar.gz"
-THEORA_URL="http://downloads.xiph.org/releases/theora/${THEORA_VERSION}.tar.gz"
 SPEEX_URL="http://downloads.xiph.org/releases/speex/${SPEEX_VERSION}.tar.gz"
 LIBXML2_URL="https://github.com/GNOME/libxml2.git"
 HARFBUZZ_URL="https://github.com/harfbuzz/harfbuzz.git"
@@ -120,7 +118,6 @@ download_sources() {
         [ ! -f fontconfig.tar.xz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$FONTCONFIG_URL' -o fontconfig.tar.xz"
         [ ! -f fribidi.tar.xz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$FRIBIDI_URL' -o fribidi.tar.xz"
         [ ! -f bluray.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$BLURAY_URL' -o bluray.tar.gz"
-        [ ! -f theora.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$THEORA_URL' -o theora.tar.gz"
         [ ! -f speex.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$SPEEX_URL' -o speex.tar.gz"
         [ ! -f libexpat.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$LIBEXPAT_URL' -o libexpat.tar.gz"
         [ ! -f budfread.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$BUDFREAD_URL' -o budfread.tar.gz"
@@ -141,6 +138,7 @@ download_sources() {
         [ ! -d libvpx ] && echo "git clone --depth 1 https://chromium.googlesource.com/webm/libvpx"
         [ ! -d libxml2 ] && echo "git clone --depth 1 '$LIBXML2_URL' libxml2"
         [ ! -d harfbuzz ] && echo "git clone --depth 1 '$HARFBUZZ_URL' harfbuzz"
+        [ ! -d theora ] && echo "git clone --depth 1 https://gitlab.xiph.org/xiph/theora.git"
         [ ! -d libwebp ] && echo "git clone --depth 1 '$WEBP_URL' libwebp"
         [ ! -d vmaf ] && echo "git clone --depth 1 '$VMAF_URL' vmaf"
         [ ! -d vidstab ] && echo "git clone --depth 1 '$VIDSTAB_URL' vidstab"
@@ -227,7 +225,6 @@ download_sources() {
     [ ! -d fontconfig ] && tar -xf fontconfig.tar.xz && mv "$FONTCONFIG_VERSION" fontconfig
     [ ! -d fribidi ] && tar -xf fribidi.tar.xz && mv "$FRIBIDI_VERSION" fribidi
     [ ! -d bluray ] && tar -xf bluray.tar.gz && mv "$BLURAY_VERSION"* bluray
-    [ ! -d theora ] && tar -xf theora.tar.gz && mv "$THEORA_VERSION" theora
     [ ! -d speex ] && tar -xf speex.tar.gz && mv "$SPEEX_VERSION" speex
     [ ! -d libexpat ] && tar -xf libexpat.tar.gz && mv "$LIBEXPAT_VERSION" libexpat
     [ ! -d budfread ] && tar -xf budfread.tar.gz && mv "$BUDFREAD_VERSION" budfread
