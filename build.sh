@@ -43,6 +43,7 @@ esac
 export CC="${HOST}-gcc"
 export CXX="${HOST}-g++"
 export AR="${HOST}-ar"
+export AS="${HOST}-as"
 export RANLIB="${HOST}-ranlib"
 export STRIP="${HOST}-strip"
 export NM="${HOST}-nm"
