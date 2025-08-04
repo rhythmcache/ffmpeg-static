@@ -60,7 +60,9 @@ jobs:
           subversion \
           libtool \
           gperf \
-          libtool-bin
+          libtool-bin \
+          nasm \
+          yasm
 
     - name: Install pipx and meson
       run: |
