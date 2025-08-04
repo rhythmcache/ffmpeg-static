@@ -112,6 +112,15 @@ for script in "${DOWNLOADER_SCRIPT}" "${BUILD_FUNCTIONS}"; do
 done
 
 download_sources
+build_zlib
+build_openssl
+build_libexpat
+build_libxml2
+build_udfread
+build_bluray
+build_speex
+build_libcodec2
+: <'IDK'
 build_libcaca
 [ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp  "$ROOT_DIR/patches/vapoursynth"/*  "$BUILD_DIR/vapoursynth" 
 build_zlib
@@ -195,6 +204,7 @@ build_highway
 build_libjxl
 build_libqrencode
 build_quirc
+IDK
 #build_fftw
 #build_chromaprint
 #----------- These 4 are needed to build librsvg---------------#
