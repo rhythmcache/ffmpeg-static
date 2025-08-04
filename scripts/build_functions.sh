@@ -1220,9 +1220,9 @@ build_libsrt() {
     rm -rf build && mkdir build && cd build
 
     cmake .. \
-        "${COMMON_CMAKE_FLAGS[@]}" \
         -DCMAKE_SYSTEM_NAME=Linux \
         -DCMAKE_BUILD_TYPE=Release \
+        "${COMMON_CMAKE_FLAGS[@]}" \
         -DENABLE_STATIC=ON \
         -DENABLE_SHARED=OFF \
         -DENABLE_APPS=OFF \
@@ -1719,7 +1719,7 @@ build_davs2() {
     export STRIP="$STRIP_ABS"
     local ASM_FLAG=""
 
-    if [ "$ARCH" != "x86" ] && [ "$ARCH" != "x86_64" ]; then
+    if [ "$ARCH" != "x86_64" ]; then
         ASM_FLAG="--disable-asm"
     fi
 
