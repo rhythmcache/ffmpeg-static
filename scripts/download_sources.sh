@@ -134,6 +134,7 @@ download_sources() {
     # Build clone commands for git repositories
     {
         [ ! -d freetype ] && echo "git clone --depth 1 '$FREETYPE_URL' freetype"
+        [ ! -d lcms ] && echo "git clone --depth 1 https://github.com/mm2/Little-CMS lcms"
         [ ! -d openjpeg ] && echo "git clone --depth 1 https://github.com/uclouvain/openjpeg openjpeg"
         [ ! -d libvpx ] && echo "git clone --depth 1 https://chromium.googlesource.com/webm/libvpx"
         [ ! -d libxml2 ] && echo "git clone --depth 1 '$LIBXML2_URL' libxml2"
