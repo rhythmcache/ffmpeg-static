@@ -46,7 +46,6 @@ BZIP2_URL="https://github.com/libarchive/bzip2/archive/refs/tags/${BZIP2_VERSION
 OPENSSL_URL="https://github.com/openssl/openssl/releases/download/${OPENSSL_VERSION}/${OPENSSL_VERSION}.tar.gz"
 X264_URL="https://code.videolan.org/videolan/x264/-/archive/master/${X264_VERSION}.tar.gz"
 X265_URL="http://ftp.videolan.org/pub/videolan/x265/${X265_VERSION}.tar.gz"
-LIBVPX_URL="https://github.com/webmproject/libvpx/archive/v1.15.0/${LIBVPX_VERSION}.tar.gz"
 AAC_URL="https://downloads.sourceforge.net/opencore-amr/${AAC_VERSION}.tar.gz"
 LAME_URL="https://sourceforge.net/projects/lame/files/lame/3.100/${LAME_VERSION}.tar.gz/download"
 OPUS_URL="https://github.com/xiph/opus/releases/download/v1.5.2/${OPUS_VERSION}.tar.gz"
@@ -86,7 +85,7 @@ LIBBS2B_URL="https://sourceforge.net/projects/bs2b/files/libbs2b/3.1.0/${LIBBS2B
 FFTW_URL="https://www.fftw.org/${FFTW_VERSION}.tar.gz"
 LIBFFI_URL="https://github.com/libffi/libffi/releases/download/v3.5.2/${LIBFFI_VERSION}.tar.gz"
 
-# Number of parallel downloads (can be overridden by setting PARALLEL_DOWNLOADS)
+# Number of parallel downloads 
 PARALLEL_DOWNLOADS=${PARALLEL_DOWNLOADS:-8}
 
 download_sources() {
@@ -94,13 +93,12 @@ download_sources() {
 
     echo "Starting parallel downloads (${PARALLEL_DOWNLOADS} concurrent)..."
 
-    # Create temporary directory and files for download/clone commands
+    # Create temporary directory and files for  commands
     local temp_dir="${ROOT_DIR}/temporary-$"
     mkdir -p "$temp_dir"
     local download_cmds="$temp_dir/download_cmds"
     local clone_cmds="$temp_dir/clone_cmds"
 
-    # Build download commands for archives
     {
         [ ! -f zlib.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$ZLIB_URL' -o zlib.tar.gz"
         [ ! -f brotli.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$BROTLI_URL' -o brotli.tar.gz"
@@ -110,7 +108,6 @@ download_sources() {
         [ ! -f openssl.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$OPENSSL_URL' -o openssl.tar.gz"
         [ ! -f x264.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$X264_URL' -o x264.tar.gz"
         [ ! -f x265.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$X265_URL' -o x265.tar.gz"
-        [ ! -f libvpx.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$LIBVPX_URL' -o libvpx.tar.gz"
         [ ! -f aac.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$AAC_URL' -o aac.tar.gz"
         [ ! -f libgsm.tar.xz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$LIBGSM_URL' -o libgsm.tar.xz"
         [ ! -f lame.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$LAME_URL' -o lame.tar.gz"
@@ -130,7 +127,6 @@ download_sources() {
         [ ! -f openmpt.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$OPENMPT_URL' -o openmpt.tar.gz"
         [ ! -f tiff.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$TIFF_URL' -o tiff.tar.gz"
         [ ! -f xvid.tar.xz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$XVID_URL' -o xvid.tar.xz"
-      #  [ ! -f ffmpeg.tar.xz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$FFMPEG_URL' -o ffmpeg.tar.xz"
         [ ! -f libssh.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$LIBSSH_URL' -o libssh.tar.gz"
         [ ! -f libbs2b.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$LIBBS2B_URL' -o libbs2b.tar.gz"
         [ ! -f svtav1.tar.gz ] && echo "curl -L --fail --retry 3 --retry-delay 2 '$SVTAV1_URL' -o svtav1.tar.gz"
@@ -142,6 +138,7 @@ download_sources() {
     {
         [ ! -d freetype ] && echo "git clone --depth 1 '$FREETYPE_URL' freetype"
         [ ! -d openjpeg ] && echo "git clone --depth 1 https://github.com/uclouvain/openjpeg openjpeg"
+        [ ! -d libvpx ] && echo "git clone --depth 1 https://chromium.googlesource.com/webm/libvpx"
         [ ! -d libxml2 ] && echo "git clone --depth 1 '$LIBXML2_URL' libxml2"
         [ ! -d harfbuzz ] && echo "git clone --depth 1 '$HARFBUZZ_URL' harfbuzz"
         [ ! -d libwebp ] && echo "git clone --depth 1 '$WEBP_URL' libwebp"
@@ -204,13 +201,13 @@ download_sources() {
         cat "$clone_cmds" | xargs -I {} -P "$PARALLEL_DOWNLOADS" bash -c '{}'
     fi
 
-    # Special case for SVN (can't easily parallelize with the others)
+    
     [ ! -d xavs ] && svn checkout https://svn.code.sf.net/p/xavs/code/ xavs
 
     # Clean up temp files
     rm -f "$download_cmds" "$clone_cmds"
 
-    # Extract archives (keeping your original extraction logic)
+    # Extract archives 
     [ ! -d zlib ] && tar -xf zlib.tar.gz && mv "$ZLIB_VERSION" zlib
     [ ! -d brotli ] && tar -xf brotli.tar.gz && mv "brotli-${BROTLI_VERSION}" brotli
     [ ! -d xz ] && tar -xf xz.tar.gz && mv "$XZ_VERSION" xz
@@ -219,7 +216,6 @@ download_sources() {
     [ ! -d openssl ] && tar -xf openssl.tar.gz && mv "$OPENSSL_VERSION" openssl
     [ ! -d x264 ] && tar -xf x264.tar.gz && mv "$X264_VERSION" x264
     [ ! -d x265 ] && tar -xf x265.tar.gz && mv "$X265_VERSION" x265
-    [ ! -d libvpx ] && tar -xf libvpx.tar.gz && mv "$LIBVPX_VERSION" libvpx
     [ ! -d aac ] && tar -xf aac.tar.gz && mv "$AAC_VERSION" aac
     [ ! -d lame ] && tar -xf lame.tar.gz && mv "$LAME_VERSION" lame
     [ ! -d libpng ] && tar -xf libpng.tar.gz && mv "$LIBPNG_VERSION" libpng
@@ -243,6 +239,5 @@ download_sources() {
     [ ! -d libbs2b ] && tar -xf libbs2b.tar.gz && mv "$LIBBS2B_VERSION" libbs2b
     [ ! -d fftw ] && tar -xf fftw.tar.gz && mv "$FFTW_VERSION" fftw
     [ ! -d libffi ] && tar -xf libffi.tar.gz && mv "$LIBFFI_VERSION" libffi
- #   [ ! -d ffmpeg ] && tar -xf ffmpeg.tar.xz && mv "$FFMPEG_VERSION" ffmpeg
     
 }
