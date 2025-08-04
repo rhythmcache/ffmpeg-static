@@ -288,7 +288,7 @@ int main() {
   endif
 
   # AVX2 library (if x86 ASM enabled)
-  avx2_lib = []
+  vapoursynth_link_with = []
   if x86 and x86_asm
     avx2_sources = [
       'src/core/kernel/x86/convolution_avx2.cpp',
@@ -303,7 +303,8 @@ int main() {
       cpp_args: avx2_flags,
       include_directories: inc_dir
     )
-    vapoursynth_deps += avx2_lib
+    
+    vapoursynth_link_with = [avx2_lib]
   endif
 
   if static_build
@@ -311,6 +312,7 @@ int main() {
       core_sources,
       include_directories: inc_dir,
       dependencies: vapoursynth_deps,
+      link_with: vapoursynth_link_with,
       install: true
     )
   else
@@ -318,6 +320,7 @@ int main() {
       core_sources,
       include_directories: inc_dir,
       dependencies: vapoursynth_deps,
+      link_with: vapoursynth_link_with,
       link_args: undefined_ldflags,
       install: true,
       version: '0.0.0'
