@@ -133,7 +133,7 @@ build_ffmpeg() {
         --pkg-config-flags="--static" \
         --extra-cflags="-I$PREFIX/include" \
         --extra-ldflags="-L$PREFIX/lib" \
-        --extra-libs="-lm -lpthread -lstdc++ -lcrypto -lz -lfftw3" \
+        --extra-libs="-lm -lpthread -lstdc++ -lcrypto -lz -lfftw3 -lssp" \
         --enable-static \
         --disable-shared \
         --disable-debug \
