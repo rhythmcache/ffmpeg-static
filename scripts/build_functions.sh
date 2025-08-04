@@ -1220,9 +1220,9 @@ build_libsrt() {
     rm -rf build && mkdir build && cd build
 
     cmake .. \
+        "${COMMON_CMAKE_FLAGS[@]}" \
         -DCMAKE_SYSTEM_NAME=Linux \
         -DCMAKE_BUILD_TYPE=Release \
-        "${COMMON_CMAKE_FLAGS[@]}" \
         -DENABLE_STATIC=ON \
         -DENABLE_SHARED=OFF \
         -DENABLE_APPS=OFF \
@@ -1684,7 +1684,7 @@ build_xavs2() {
     export STRIP="$STRIP_ABS"
     local ASM_FLAG=""
 
-    if [ "$ARCH" != "x86" ] && [ "$ARCH" != "x86_64" ]; then
+    if [ "$ARCH" != "x86_64" ]; then
         ASM_FLAG="--disable-asm"
     fi
 
@@ -1694,8 +1694,8 @@ build_xavs2() {
         ./configure \
         --prefix="$PREFIX" \
         --host="$TARGET" \
-        --extra-cflags="-fPIC -Os -ffunction-sections -fdata-sections -DNDEBUG" \
-        --extra-ldflags="-static -Wl,--gc-sections -Wl,--strip-all -Wl,--allow-multiple-definition" \
+        --extra-cflags="$CFLAGS" \
+        --extra-ldflags="$LDFLAGS" \
           $ASM_FLAG \
         --enable-static \
         --sysroot="$SYSROOT" \
