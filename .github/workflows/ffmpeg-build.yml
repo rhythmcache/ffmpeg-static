@@ -16,10 +16,10 @@ jobs:
             toolchain_url: "https://github.com/rhythmcache/musl-toolchain/releases/download/musl-toolchains-20250803-094319/musl-cross-i686-linux-musl.tar.gz"
             cross_prefix: "i686-linux-musl"
           - arch: aarch64
-            toolchain_url: "https://github.com/rhythmcache/musl-toolchain/releases/download/musl-toolchains-20250803-094319/musl-cross-aarch64-linux-musl.tar.gz"
+            toolchain_url: "https://github.com/bazel-contrib/musl-toolchain/releases/download/v0.1.27/musl-1.2.3-platform-x86_64-unknown-linux-gnu-target-aarch64-linux-musl.tar.gz"
             cross_prefix: "aarch64-linux-musl"
           - arch: x86_64
-            toolchain_url: "https://github.com/rhythmcache/musl-toolchain/releases/download/musl-toolchains-20250803-094319/musl-cross-x86_64-linux-musl.tar.gz"
+            toolchain_url: "https://github.com/bazel-contrib/musl-toolchain/releases/download/v0.1.27/musl-1.2.3-platform-x86_64-unknown-linux-gnu-target-x86_64-linux-musl.tar.gz"
             cross_prefix: "x86_64-linux-musl"
     
     name: Build ${{ matrix.arch }}
