@@ -111,6 +111,49 @@ for script in "${DOWNLOADER_SCRIPT}" "${BUILD_FUNCTIONS}"; do
     source "$script"
 done
 
+
+build_debug_ffmpeg() {
+    echo "Building FFmpeg for $ARCH (minimal test build)..."
+    cd "$BUILD_DIR/ffmpeg"
+    (make clean && make distclean) || true
+    
+    ./configure \
+        --enable-cross-compile \
+        --prefix="$PREFIX" \
+        --host-cc=/usr/bin/gcc \
+        --cc="$CC_ABS" \
+        --cxx="$CXX_ABS" \
+        --ar="$AR_ABS" \
+        --nm="$NM_ABS" \
+        --strip="$STRIP_ABS" \
+        --ranlib="$RANLIB_ABS" \
+        --arch="$ARCH" \
+        --target-os="linux" \
+        --pkg-config-flags="--static" \
+        --extra-cflags="-I$PREFIX/include" \
+        --extra-ldflags="-L$PREFIX/lib $LDFLAGS" \
+        --extra-libs="-lm -lpthread -lstdc++ -lcrypto -lz" \
+        --enable-static \
+        --disable-shared \
+        --disable-debug \
+        --disable-doc \
+        --disable-x86asm \
+        --enable-gpl \
+        --enable-version3 \
+        --enable-nonfree \
+        --enable-libspeex \
+        --enable-libcodec2 \
+        --enable-libbluray \
+        --enable-libxml2 \
+        --enable-openssl \
+        --enable-zlib
+
+    make -j"$(nproc)"
+    make install
+
+    echo "✔ FFmpeg built successfully"
+}
+
 download_sources
 build_zlib
 build_openssl
@@ -204,7 +247,6 @@ build_highway
 build_libjxl
 build_libqrencode
 build_quirc
-IDK
 #build_fftw
 #build_chromaprint
 #----------- These 4 are needed to build librsvg---------------#
@@ -215,3 +257,5 @@ IDK
 # build_librsvg
 #---------------------------------------------------------------#
 build_ffmpeg
+IDK 
+build_debug_ffmpeg
