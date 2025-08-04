@@ -231,7 +231,7 @@ build_twolame
 build_opus
 build_ogg
 build_vorbis
-build_speex
+#build_speex
 build_aom
 build_dav1d
 build_fribidi
@@ -244,8 +244,8 @@ build_libpng
 build_harfbuzz
 build_fontconfig
 build_libass
-build_udfread
-build_bluray
+#build_udfread
+#build_bluray
 build_libtheora
 
 # build_libjpeg (useless lib)
