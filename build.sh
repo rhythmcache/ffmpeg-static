@@ -51,8 +51,6 @@ export STRINGS="${HOST}-strings"
 
 if [ "$ARCH" = "x86" ] || [ "$ARCH" = "x86_64" ]; then
     export AS=nasm
-else
-    export AS="${HOST}-as"
 fi
 
 resolve_absolute_path() {
@@ -72,7 +70,6 @@ AR_ABS=$(resolve_absolute_path "$AR")
 RANLIB_ABS=$(resolve_absolute_path "$RANLIB")
 STRIP_ABS=$(resolve_absolute_path "$STRIP")
 NM_ABS=$(resolve_absolute_path "$NM")
-AS_ABS=$(resolve_absolute_path "$AS")
 
 SIZE_CFLAGS="-Os -ffunction-sections -fdata-sections"
 SIZE_CXXFLAGS="-Os -ffunction-sections -fdata-sections"
