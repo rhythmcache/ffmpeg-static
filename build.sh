@@ -51,7 +51,7 @@ export STRINGS="${HOST}-strings"
 
 if [ "$ARCH" = "x86" ] || [ "$ARCH" = "x86_64" ]; then
     export AS=nasm
-elif [ "$ARCH" = "armv7" ]; then
+else
     export AS="${HOST}-as"
 fi
 
