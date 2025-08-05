@@ -235,6 +235,7 @@ download_sources
 build_zlib
 build_openssl
 build_x264
+build_libvpx
 build_libcaca
 build_xavs
 build_libsrt
