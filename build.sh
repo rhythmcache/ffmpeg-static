@@ -237,9 +237,11 @@ build_ffmpeg() {
 }
 
 download_sources
-build_libcaca
 build_zlib
 build_openssl
+build_x264
+build_libcaca
+build_xavs
 build_libsrt
 build_openjpeg
 build_liblzma
@@ -247,7 +249,6 @@ build_zstd
 build_pcre2
 build_rtmp
 build_libgsm
-build_x264
 build_x265
 build_libvpx
 [ -z "$RELEASE" ] && build_aac
@@ -293,7 +294,6 @@ build_aribb24
 build_uavs3d
 build_xvidcore
 build_kvazaar
-build_xavs
 build_xavs2
 build_davs2
 build_vvenc
