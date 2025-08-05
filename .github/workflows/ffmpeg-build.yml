@@ -75,7 +75,17 @@ jobs:
         pipx install meson
         # Verify installation
         meson --version
+        
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
 
+    - name: Install cargo-c
+      run: cargo install cargo-c
+      
     - name: Download musl toolchain
       run: |
         echo "Downloading musl toolchain for ${{ matrix.arch }}..."
