@@ -25,6 +25,15 @@ build_libunwind() {
 build_rav1e() {
     build_libunwind
 
+    echo "[+] Checking if Rust target '$RUST_TARGET' is installed..."
+if ! rustup target list --installed | grep -q "^$RUST_TARGET$"; then
+    echo "[+] Installing Rust target '$RUST_TARGET'..."
+    rustup target add "$RUST_TARGET" || {
+        echo "[-] Failed to add target $RUST_TARGET"
+        exit 1
+    }
+fi
+
     echo "[+] Building rav1e for $ARCH..."
     echo "[+] Cloning..."
 
