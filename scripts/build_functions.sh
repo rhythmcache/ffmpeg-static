@@ -300,18 +300,33 @@ build_libvpx() {
     (make clean && make distclean) || true
 
     case "$ARCH" in
-        x86_64) VPX_TARGET="x86_64-linux-gcc" ;;
-        x86) VPX_TARGET="x86-linux-gcc" ;;
-        armv7) VPX_TARGET="armv7-linux-gcc" ;;
-        aarch64) VPX_TARGET="arm64-linux-gcc" ;;
-        riscv64) VPX_TARGET="generic-gnu" ;;
+        x86_64)
+            VPX_TARGET="x86_64-linux-gcc"
+            AS="nasm"
+            ;;
+        x86)
+            VPX_TARGET="x86-linux-gcc"
+            AS="nasm"
+            ;;
+        armv7)
+            VPX_TARGET="armv7-linux-gcc"
+            AS="${HOST}-as"
+            ;;
+        aarch64)
+            VPX_TARGET="arm64-linux-gcc"
+            AS="${HOST}-as"
+            ;;
+        riscv64)
+            VPX_TARGET="generic-gnu"
+            AS="${HOST}-as"
+            ;;
         *)
             echo "Unsupported arch for libvpx"
             exit 1
             ;;
     esac
 
-    ./configure \
+    AS="$AS" ./configure \
         --prefix="${PREFIX}" \
         --target="${VPX_TARGET}" \
         --disable-examples \
@@ -330,7 +345,7 @@ build_libvpx() {
     make -j"$(nproc)"
     make install
 
-    echo " libvpx built successfully"
+    echo "✔ libvpx built successfully"
 }
 
 build_aac() {
