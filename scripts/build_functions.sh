@@ -4,13 +4,13 @@ build_zlib() {
     echo "[+] Building zlib for $ARCH..."
     cd "$BUILD_DIR/zlib" || exit 1
 
-    export CHOST="$HOST"
+   rm -rf build &&  mkdir build && cd build
+   cmake .. \
+   "${COMMON_CMAKE_FLAGS[@]}" \
+   -DZLIB_BUILD_EXAMPLES=OFF \
+   -DBUILD_SHARED_LIBS=OFF
 
-    CONFIGURE_CFLAGS="-fPIC --sysroot=$SYSROOT"
-
-    CFLAGS="$CONFIGURE_CFLAGS" ./configure --prefix="$PREFIX" --static
-
-    make -j"$(nproc)" CFLAGS="$CFLAGS"
+    make -j"$(nproc)"
     make install
 
     echo "[+] Zlib built successfully"
