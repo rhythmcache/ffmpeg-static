@@ -13,6 +13,8 @@ build_zlib() {
     make -j"$(nproc)"
     make install
 
+    [ ! -f "$PREFIX/lib/pkgconfig/zlib.pc" ] && [ -f "$PREFIX/share/pkgconfig/zlib.pc" ] && cp "$PREFIX/share/pkgconfig/zlib.pc" "$PREFIX/lib/pkgconfig/zlib.pc" 
+
     echo "[+] Zlib built successfully"
 }
 
