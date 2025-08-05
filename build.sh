@@ -111,7 +111,7 @@ COMMON_CMAKE_FLAGS=(
 DOWNLOADER_SCRIPT="${ROOT_DIR}/scripts/download_sources.sh"
 BUILD_FUNCTIONS="${ROOT_DIR}/scripts/build_functions.sh"
 RAV1E_SCRIPT="${ROOT_DIR}/scripts/build_rav1e.sh"
-[ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp "$ROOT_DIR/patches/vapoursynth"/* "$BUILD_DIR/vapoursynth"
+
 for script in "$DOWNLOADER_SCRIPT" "$BUILD_FUNCTIONS" "$RAV1E_SCRIPT"; do
     if [ ! -f "$script" ]; then
         echo "Missing required script: $script" >&2
@@ -232,6 +232,7 @@ build_ffmpeg() {
 }
 
 download_sources
+[ -d "$BUILD_DIR/vapoursynth" ] && [ -d "$ROOT_DIR/patches/vapoursynth" ] && cp "$ROOT_DIR/patches/vapoursynth"/* "$BUILD_DIR/vapoursynth"
 build_zlib
 build_openssl
 build_x264
