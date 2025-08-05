@@ -48,12 +48,10 @@ export RANLIB="${HOST}-ranlib"
 export STRIP="${HOST}-strip"
 export NM="${HOST}-nm"
 export STRINGS="${HOST}-strings"
-export NASM=nasm
-export YASM=yasm
 
 if [ "$ARCH" = "x86" ] || [ "$ARCH" = "x86_64" ]; then
     export AS=nasm
-else
+elif [ "$ARCH" = "armv7" ]; then
     export AS="${HOST}-as"
 fi
 
