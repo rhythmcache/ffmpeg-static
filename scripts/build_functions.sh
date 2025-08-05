@@ -1493,6 +1493,33 @@ build_kvazaar() {
     make install || exit 1
 }
 
+
+build_xavs() {
+    echo "Building xavs for $ARCH..."
+
+    cd "$BUILD_DIR/xavs/trunk" || exit 1
+    make distclean || true
+
+    EXTRA_CONFIGURE_FLAGS=""
+if [ "$ARCH" != "x86" ] && [ "$ARCH" != "x86_64" ]; then
+    EXTRA_CONFIGURE_FLAGS="--disable-asm"
+fi
+
+    ./configure \
+  --prefix="$PREFIX" \
+  --enable-static \
+  --disable-shared \
+  $EXTRA_CONFIGURE_FLAGS \
+  CC="$CC_ABS" \
+  AR="$AR_ABS" \
+  RANLIB="$RANLIB_ABS" \
+  STRIP="$STRIP_ABS" \
+  CFLAGS="$CFLAGS" \
+  LDFLAGS="$LDFLAGS"
+  
+    make -j"$(nproc)" && make install
+}
+
 build_xavs2() {
     echo "[+] Building xavs2 for $ARCH..."
 
