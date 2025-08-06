@@ -113,3 +113,23 @@ This builds FFmpeg with a massive amount of libraries:
 - Cross-compilation uses musl libc for better compatibility
 - The build takes a while since it compiles everything from source
 
+
+
+## TODO
+
+- [ ] Add more video and audio codecs
+- [ ] Add GPU acceleration support?
+- [ ] Support for more architectures (maybe MIPS?)
+- [ ] Add Docker support for easier cross-compilation ?
+- [ ] Include more subtitle formats and processors ?
+
+## Contributing
+
+Pull requests are welcome! If you want to add a library or fix something:
+
+1. Fork the repo
+2. Add your library to the appropriate build script in `scripts/`
+3. Update the configure flags in `build_ffmpeg()` function
+4. Test it on at least one architecture 
+5. Update this README with the new library
+6. Submit a PR
