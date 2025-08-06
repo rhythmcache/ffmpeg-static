@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FFmpeg Static Builds for Linux - rhythmcache</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #fafafa;
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 0;
+        }
+        
+        .header {
+            background-color: #f1f1f1;
+            padding: 25px 30px;
+            border-bottom: 2px solid #ccc;
+        }
+        
+        .header h1 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c2c2c;
+        }
+        
+        .header p {
+            margin: 0;
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .info {
+            padding: 25px 30px;
+            background-color: #fff9e6;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        
+        .info h2 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            color: #444;
+        }
+        
+        .info p {
+            margin: 0 0 12px 0;
+            color: #555;
+        }
+        
+        .info ul {
+            margin: 10px 0 0 20px;
+            color: #555;
+        }
+        
+        .info li {
+            margin-bottom: 5px;
+        }
+        
+        .license-info {
+            background-color: #f0f8ff;
+            border: 1px solid #b8d4f0;
+            padding: 15px;
+            margin: 15px 0 0 0;
+            border-radius: 3px;
+        }
+        
+        .license-info strong {
+            color: #2c5aa0;
+        }
+        
+        .license-info a {
+            color: #2c5aa0;
+            text-decoration: underline;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .error {
+            background: #ffe6e6;
+            border: 1px solid #ff9999;
+            padding: 15px;
+            margin: 20px 0;
+            color: #cc0000;
+            border-radius: 3px;
+        }
+        
+        .release {
+            border: 1px solid #ddd;
+            margin-bottom: 25px;
+            background: white;
+        }
+        
+        .release-header {
+            background-color: #f8f8f8;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .release-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        
+        .release-date {
+            background-color: #e0e0e0;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #666;
+            font-weight: normal;
+        }
+        
+        .release-notes {
+            padding: 20px;
+            color: #555;
+            font-size: 14px;
+            background-color: #fafafa;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .assets {
+            padding: 20px;
+        }
+        
+        .assets h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #444;
+            font-weight: bold;
+        }
+        
+        .asset-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .asset-table th {
+            background-color: #f5f5f5;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            font-weight: bold;
+            color: #333;
+            font-size: 13px;
+        }
+        
+        .asset-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        
+        .asset-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .filename {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #444;
+            font-weight: bold;
+        }
+        
+        .filesize {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+        }
+        
+        .download-link {
+            background-color: #007acc;
+            color: white;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .download-link:hover {
+            background-color: #005a9e;
+        }
+        
+        .footer {
+            background-color: #f1f1f1;
+            padding: 25px 30px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+        }
+        
+        .footer-links {
+            margin-bottom: 15px;
+        }
+        
+        .footer-links a {
+            margin: 0 15px;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .github-link, .telegram-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .icon {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border: none;
+            }
+            
+            .header, .info, .content, .footer {
+                padding: 20px;
+            }
+            
+            .release-header {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+            
+            .asset-table {
+                font-size: 12px;
+            }
+            
+            .asset-table th,
+            .asset-table td {
+                padding: 8px 5px;
+            }
+            
+            .footer-links a {
+                display: block;
+                margin: 8px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FFmpeg Static Builds</h1>
+            <p>Statically linked FFmpeg &amp; FFprobe binaries for Linux</p>
+        </div>
+        
+        <div class="info">
+            <h2>Welcome</h2>
+            <p>Here you will find statically compiled FFmpeg and FFprobe binaries for Linux systems. These builds are created using musl toolchains for maximum compatibility.</p>
+            
+            <p><strong></strong></p>
+            <ul>
+                <li>Statically compiled</li>
+                <li>Built with musl libc for better portability</li>
+                <li>Available for x86_64, aarch64, armv7, x86,and riscv64 etc</li>
+            </ul>
+            
+            <div class="license-info">
+                <strong>License:</strong> All releases are distributed under the <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GNU General Public License v3.0 (GPL-3)</a>. 
+            </div>
+        </div>
+        
+        <div class="content">
+            <div id="content">
+                <div class="loading">Loading releases...</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-links">
+                <a href="https://github.com/rhythmcache/ffmpeg-static" target="_blank" class="github-link">
+                    <svg class="icon" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-.98.08-2.04 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.06.16 1.84.08 2.04.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    Source Code
+                </a>
+                <a href="https://rhythmcache.t.me" target="_blank" class="telegram-link">
+                    <svg class="icon" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.287 5.906c-.778.324-2.334.994-4.666 2.01-.378.15-.577.298-.595.442-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294.26.006.549-.1.868-.32 2.179-1.471 3.304-2.214 3.374-2.23.05-.012.12-.026.166.016.047.041.042.12.037.141-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8.154 8.154 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629.093.06.183.125.27.187.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.426 1.426 0 0 0-.013-.315.337.337 0 0 0-.114-.217.526.526 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09z"/>
+                    </svg>
+                    Telegram
+                </a>
+            </div>
+            <p>Automated builds updated regularly</p>
+            <p>Report issues or contribute on GitHub</p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://api.github.com/repos/rhythmcache/ffmpeg-static/releases';
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        
+        function createReleaseHTML(release) {
+            const assets = release.assets.filter(asset => 
+                asset.name.includes('ffmpeg') || asset.name.includes('ffprobe')
+            );
+            
+            if (assets.length === 0) return '';
+            
+            let assetsHTML = assets.map(asset => `
+                <tr>
+                    <td class="filename">${asset.name}</td>
+                    <td class="filesize">${formatBytes(asset.size)}</td>
+                    <td><a href="${asset.browser_download_url}" class="download-link" download>Download</a></td>
+                </tr>
+            `).join('');
+            
+            const releaseNotes = release.body ? 
+                `<div class="release-notes">${release.body.replace(/\n/g, '<br>')}</div>` : '';
+            
+            return `
+                <div class="release">
+                    <div class="release-header">
+                        <h2 class="release-title">${release.tag_name}</h2>
+                        <span class="release-date">${formatDate(release.published_at)}</span>
+                    </div>
+                    ${releaseNotes}
+                    <div class="assets">
+                        <h3>Downloads</h3>
+                        <table class="asset-table">
+                            <thead>
+                                <tr>
+                                    <th>Filename</th>
+                                    <th>Size</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${assetsHTML}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+        
+        async function loadReleases() {
+            const contentDiv = document.getElementById('content');
+            
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const releases = await response.json();
+                
+                if (releases.length === 0) {
+                    contentDiv.innerHTML = '<div class="error">No releases found.</div>';
+                    return;
+                }
+                
+                const releasesHTML = releases
+                    .map(release => createReleaseHTML(release))
+                    .filter(html => html !== '')
+                    .join('');
+                
+                if (releasesHTML === '') {
+                    contentDiv.innerHTML = '<div class="error">No FFmpeg assets found in releases.</div>';
+                } else {
+                    contentDiv.innerHTML = releasesHTML;
+                }
+                
+            } catch (error) {
+                console.error('Error loading releases:', error);
+                contentDiv.innerHTML = `
+                    <div class="error">
+                        Failed to load releases: ${error.message}<br>
+                        Please check your internet connection or try again later.
+                    </div>
+                `;
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadReleases);
+    </script>
+</body>
+</html>
