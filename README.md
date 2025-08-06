@@ -122,6 +122,7 @@ This builds FFmpeg with a massive amount of libraries:
 - [ ] Support for more architectures (maybe MIPS?)
 - [ ] Add Docker support for easier cross-compilation ?
 - [ ] Include more subtitle formats and processors ?
+- [ ] Other platforms support (Maybe Android/Windows?)
 
 ## Contributing
 
