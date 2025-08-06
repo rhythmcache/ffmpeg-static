@@ -1,0 +1,297 @@
+# Complete build workflow with toolchain setup
+name: Build with musl toolchain
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86, aarch64, x86_64]
+        include:
+          - arch: x86
+            toolchain_url: "https://github.com/rhythmcache/musl-toolchain/releases/download/musl-toolchains-20250803-094319/musl-cross-i686-linux-musl.tar.gz"
+            cross_prefix: "i686-linux-musl"
+            creates_subdirectory: true
+          - arch: aarch64
+            toolchain_url: "https://github.com/bazel-contrib/musl-toolchain/releases/download/v0.1.27/musl-1.2.3-platform-x86_64-unknown-linux-gnu-target-aarch64-linux-musl.tar.gz"
+            cross_prefix: "aarch64-linux-musl"
+            creates_subdirectory: false
+          - arch: x86_64
+            toolchain_url: "https://github.com/bazel-contrib/musl-toolchain/releases/download/v0.1.27/musl-1.2.3-platform-x86_64-unknown-linux-gnu-target-x86_64-linux-musl.tar.gz"
+            cross_prefix: "x86_64-linux-musl"
+            creates_subdirectory: false
+    
+    name: Build ${{ matrix.arch }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install system dependencies and build tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          ninja-build \
+          make \
+          autoconf \
+          automake \
+          libtool \
+          pkg-config \
+          texinfo \
+          gettext \
+          gperf \
+          bison \
+          flex \
+          git \
+          xz-utils \
+          unzip \
+          diffutils \
+          file \
+          findutils \
+          coreutils \
+          binutils \
+          python3 \
+          python3-pip \
+          python3-venv \
+          pipx \
+          subversion \
+          libtool \
+          gperf \
+          libtool-bin \
+          nasm \
+          yasm
+
+    - name: Install pipx and meson
+      run: |
+        python3 -m pip install --user pipx
+        python3 -m pipx ensurepath
+        export PATH="$HOME/.local/bin:$PATH"
+        pipx install meson
+        # Verify installation
+        meson --version
+        
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
+
+    - name: Install cargo-c
+      run: cargo install cargo-c
+      
+    - name: Download musl toolchain
+      run: |
+        echo "Downloading musl toolchain for ${{ matrix.arch }}..."
+        wget -O musl-cross-${{ matrix.cross_prefix }}.tar.gz \
+          "${{ matrix.toolchain_url }}"
+        
+        echo "Verifying download..."
+        ls -la musl-cross-${{ matrix.cross_prefix }}.tar.gz
+        file musl-cross-${{ matrix.cross_prefix }}.tar.gz
+
+    - name: Extract toolchain and setup PATH
+      run: |
+        echo "Extracting toolchain..."
+        
+        # Create a dedicated directory for this toolchain
+        mkdir -p toolchain-${{ matrix.arch }}
+        cd toolchain-${{ matrix.arch }}
+        
+        # Extract the toolchain
+        tar -xzf ../musl-cross-${{ matrix.cross_prefix }}.tar.gz
+        
+        echo "Contents after extraction:"
+        ls -la
+        
+        # Determine the toolchain bin directory
+        if [ "${{ matrix.creates_subdirectory }}" = "true" ]; then
+          # For toolchains that create a subdirectory (like rhythmcache i686)
+          TOOLCHAIN_SUBDIR=$(find . -maxdepth 1 -type d -name "*${{ matrix.cross_prefix }}*" | head -1)
+          if [ -z "$TOOLCHAIN_SUBDIR" ]; then
+            echo "Looking for any extracted subdirectory..."
+            TOOLCHAIN_SUBDIR=$(find . -maxdepth 1 -type d ! -name "." | head -1)
+          fi
+          echo "Toolchain subdirectory: $TOOLCHAIN_SUBDIR"
+          TOOLCHAIN_BIN="$PWD/$TOOLCHAIN_SUBDIR/bin"
+        else
+          # For toolchains that extract directly to current directory (bazel-contrib)
+          echo "Toolchain extracts directly to current directory"
+          TOOLCHAIN_BIN="$PWD/bin"
+        fi
+        
+        echo "Toolchain bin directory: $TOOLCHAIN_BIN"
+        ls -la "$TOOLCHAIN_BIN"/
+        
+        # Add toolchain bin to PATH for subsequent steps
+        echo "$TOOLCHAIN_BIN" >> $GITHUB_PATH
+        
+        # Also export for current step verification
+        export PATH="$TOOLCHAIN_BIN:$PATH"
+        export PATH="$HOME/.local/bin:$PATH"
+        
+        # Verify toolchain
+        echo "Verifying toolchain..."
+        if [ -f "$TOOLCHAIN_BIN/${{ matrix.cross_prefix }}-gcc" ]; then
+          echo "✅ Found GCC compiler"
+          "$TOOLCHAIN_BIN/${{ matrix.cross_prefix }}-gcc" --version
+        else
+          echo "❌ GCC compiler not found at expected location"
+          echo "Available files in bin directory:"
+          ls -la "$TOOLCHAIN_BIN"/ || echo "Bin directory does not exist"
+          exit 1
+        fi
+        
+        # Go back to main directory
+        cd ..
+
+    - name: Execute build script
+      id: build
+      continue-on-error: true
+      run: |
+        # Ensure PATH includes both toolchain and pipx
+        export PATH="$HOME/.local/bin:$PATH"
+        
+        # Make build script executable
+        chmod +x ./build.sh
+        
+        echo "Starting build with ${{ matrix.arch }} target..."
+        echo "Current PATH: $PATH"
+        echo "Current directory: $(pwd)"
+        
+        # Verify the cross-compiler is accessible
+        which ${{ matrix.cross_prefix }}-gcc || echo "Warning: ${{ matrix.cross_prefix }}-gcc not found in PATH"
+        
+        # Execute the build script
+        ./build.sh ${{ matrix.arch }}
+
+    - name: Upload config.log on build failure
+      if: steps.build.outcome == 'failure'
+      uses: actions/upload-artifact@v4
+      with:
+        name: config-log-${{ matrix.arch }}-failure
+        path: build/${{ matrix.arch }}/ffmpeg/ffbuild/config.log
+        if-no-files-found: warn
+        retention-days: 7
+
+    - name: Check build results and collect binaries
+      if: steps.build.outcome == 'success'
+      run: |
+        echo "Checking build results..."
+        
+        # Primary location: build/${{ matrix.arch }}/prefix/bin
+        PRIMARY_BIN_DIR="build/${{ matrix.arch }}/prefix/bin"
+        SECONDARY_BIN_DIR="build/${{ matrix.arch }}/ffmpeg"
+        
+        echo "Looking for binaries in primary location: $PRIMARY_BIN_DIR"
+        if [ -d "$PRIMARY_BIN_DIR" ]; then
+          ls -la "$PRIMARY_BIN_DIR"/
+          
+          if [ -f "$PRIMARY_BIN_DIR/ffmpeg" ] && [ -f "$PRIMARY_BIN_DIR/ffprobe" ]; then
+            echo "✅ Found both ffmpeg and ffprobe in $PRIMARY_BIN_DIR"
+            mkdir -p artifacts
+            cp "$PRIMARY_BIN_DIR/ffmpeg" artifacts/
+            cp "$PRIMARY_BIN_DIR/ffprobe" artifacts/
+            echo "BINARIES_FOUND=primary" >> $GITHUB_ENV
+          else
+            echo "❌ Missing binaries in primary location"
+            echo "Contents of $PRIMARY_BIN_DIR:"
+            ls -la "$PRIMARY_BIN_DIR"/ || echo "Directory does not exist"
+          fi
+        else
+          echo "❌ Primary bin directory does not exist: $PRIMARY_BIN_DIR"
+        fi
+        
+        # Secondary location: build/${{ matrix.arch }}/ffmpeg
+        if [ "$BINARIES_FOUND" != "primary" ]; then
+          echo "Looking for binaries in secondary location: $SECONDARY_BIN_DIR"
+          if [ -d "$SECONDARY_BIN_DIR" ]; then
+            ls -la "$SECONDARY_BIN_DIR"/
+            
+            mkdir -p artifacts
+            
+            # Look for ffmpeg or ffmpeg_g
+            if [ -f "$SECONDARY_BIN_DIR/ffmpeg" ]; then
+              echo "✅ Found ffmpeg in $SECONDARY_BIN_DIR"
+              cp "$SECONDARY_BIN_DIR/ffmpeg" artifacts/
+              echo "FFMPEG_FOUND=true" >> $GITHUB_ENV
+            elif [ -f "$SECONDARY_BIN_DIR/ffmpeg_g" ]; then
+              echo "✅ Found ffmpeg_g in $SECONDARY_BIN_DIR"
+              cp "$SECONDARY_BIN_DIR/ffmpeg_g" artifacts/ffmpeg
+              echo "FFMPEG_FOUND=true" >> $GITHUB_ENV
+            else
+              echo "❌ No ffmpeg binary found in $SECONDARY_BIN_DIR"
+            fi
+            
+            # Look for ffprobe
+            if [ -f "$SECONDARY_BIN_DIR/ffprobe" ]; then
+              echo "✅ Found ffprobe in $SECONDARY_BIN_DIR"
+              cp "$SECONDARY_BIN_DIR/ffprobe" artifacts/
+              echo "FFPROBE_FOUND=true" >> $GITHUB_ENV
+            else
+              echo "❌ No ffprobe binary found in $SECONDARY_BIN_DIR"
+            fi
+            
+            if [ "$FFMPEG_FOUND" = "true" ] || [ "$FFPROBE_FOUND" = "true" ]; then
+              echo "BINARIES_FOUND=secondary" >> $GITHUB_ENV
+            fi
+          else
+            echo "❌ Secondary bin directory does not exist: $SECONDARY_BIN_DIR"
+          fi
+        fi
+        
+        # Show what we found
+        if [ -d "artifacts" ]; then
+          echo "Final artifacts:"
+          ls -la artifacts/
+          file artifacts/* || echo "No artifacts to analyze"
+        else
+          echo "❌ No binaries were found in either location"
+          echo "Build may have failed or binaries are in an unexpected location"
+          
+          # Debug: show the entire build directory structure
+          echo "Debug: Complete build directory structure:"
+          find build/ -type f -name "*ffmpeg*" -o -name "*ffprobe*" 2>/dev/null || echo "No ffmpeg/ffprobe files found anywhere in build/"
+          
+          exit 1
+        fi
+
+    - name: Upload build artifacts
+      if: steps.build.outcome == 'success' && env.BINARIES_FOUND != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: ffmpeg-${{ matrix.arch }}-musl-binaries
+        path: artifacts/
+        retention-days: 30
+
+    - name: Display build summary
+      if: steps.build.outcome == 'success'
+      run: |
+        echo "=== BUILD SUMMARY for ${{ matrix.arch }} ==="
+        if [ "$BINARIES_FOUND" = "primary" ]; then
+          echo "✅ Build successful - Found binaries in primary location (build/${{ matrix.arch }}/prefix/bin)"
+        elif [ "$BINARIES_FOUND" = "secondary" ]; then
+          echo "⚠️  Build partially successful - Found binaries in secondary location (build/${{ matrix.arch }}/ffmpeg)"
+          echo "   This might indicate that the final installation/stripping step failed"
+        else
+          echo "❌ Build failed - No binaries found"
+          exit 1
+        fi
+        
+        if [ -d "artifacts" ]; then
+          echo "Artifacts ready for download:"
+          ls -la artifacts/
+        fi
+
+    - name: Mark build as failed if build step failed
+      if: steps.build.outcome == 'failure'
+      run: |
+        echo "❌ Build failed for ${{ matrix.arch }}"
+        echo "Config log should be available in the artifacts if it exists"
+        exit 1
