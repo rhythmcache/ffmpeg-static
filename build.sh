@@ -115,9 +115,8 @@ COMMON_CMAKE_FLAGS=(
 
 DOWNLOADER_SCRIPT="${ROOT_DIR}/scripts/download_sources.sh"
 BUILD_FUNCTIONS="${ROOT_DIR}/scripts/build_functions.sh"
-RAV1E_SCRIPT="${ROOT_DIR}/scripts/build_rav1e.sh"
 
-for script in "$DOWNLOADER_SCRIPT" "$BUILD_FUNCTIONS" "$RAV1E_SCRIPT"; do
+for script in "$DOWNLOADER_SCRIPT" "$BUILD_FUNCTIONS"; do
 	if [ ! -f "$script" ]; then
 		echo "Missing required script: $script" >&2
 		exit 1
